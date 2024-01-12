@@ -313,7 +313,7 @@ def initialize_session_state():
 
 def app():
     st.title("OmniTutor 2.0")
-    st.header("Your personalized AI Knowledge Engine 🦉")
+    st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
     st.markdown("""
         <style>
             .footer {
