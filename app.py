@@ -226,7 +226,8 @@ def initialize_file(added_files):
                     tmp.write(added_file.getvalue())
                     tmp_path = tmp.name
             temp_file_paths.append(tmp_path)
-    success_outline = st.success('Processing file...Done')
+    #success_outline = 
+    st.success('Processing file...Done')
     #time.sleep(0.5)
     #success_outline.empty()
     return temp_file_paths
@@ -250,7 +251,6 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
         course_outline_string += '\n\n' + outline[1] + '\n\n'
     with st.expander("Check the course outline", expanded=False):
         st.write(course_outline_string)
-    
     return course_outline_list
 
 ## Initialize content
