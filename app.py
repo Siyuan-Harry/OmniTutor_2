@@ -226,10 +226,9 @@ def initialize_file(added_files):
                     tmp.write(added_file.getvalue())
                     tmp_path = tmp.name
             temp_file_paths.append(tmp_path)
-    success_outline = st.empty()
     success_outline = st.success('Processing file...Done')
-    time.sleep(0.5)
-    success_outline.empty()
+    #time.sleep(0.5)
+    #success_outline.empty()
     return temp_file_paths
 
 def initialize_vdb(temp_file_paths):
@@ -348,7 +347,7 @@ def app():
             Chinese = st.checkbox('Output in Chinese')
             if Chinese:
                 ss.language = 'Chinese'
-        btn = st.button('Start learning!')
+        btn_start = st.button('Start learning!')
 
     initialize_session_state()
 
@@ -380,9 +379,9 @@ def app():
     user_question = st.chat_input("Enter your questions when learning...")
     if added_files:
         temp_file_paths = initialize_file(added_files)
-        st.session_state.embeddings_df, st.session_state.faiss_index = initialize_vdb(temp_file_paths)
+        ss.embeddings_df, ss.faiss_index = initialize_vdb(temp_file_paths)
 
-    if btn:
+    if btn_start:
         if api_key != "sk-..." and api_key !="" and api_key.startswith("sk-"):
             ss.description.empty()
             ss["OPENAI_API_KEY"] = api_key
