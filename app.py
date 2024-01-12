@@ -331,7 +331,7 @@ def app():
     """, unsafe_allow_html=True)
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
-        use_35 = st.toggle('Use GPT-3.5 (GPT-4 is default)')
+        use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
         if use_35:
             ss["openai_model"] = 'gpt-3.5-turbo-1106'
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
