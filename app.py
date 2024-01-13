@@ -388,6 +388,7 @@ def app():
             ss["openai_model"] = 'gpt-3.5-turbo-1106'
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
         added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
+        update_vdb = st.button("Okay, start process my files! ⏩️", type="primary")
         with st.expander('⚙️ Customize my course'):
             num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
             custom_options = st.multiselect(
@@ -400,7 +401,7 @@ def app():
             Chinese = st.checkbox('Output in Chinese')
             if Chinese:
                 ss.language = 'Chinese'
-        btn_next = st.button('Okay, next learning step!⏩️')
+        btn_next = st.button('Okay, next learning step! ⏩️')
 
     initialize_session_state()
 
@@ -431,10 +432,14 @@ def app():
     
     user_question = st.chat_input("Enter your questions when learning...")
 
-    if added_files:
-        time.sleep(0.5)
-        temp_file_paths = initialize_file(added_files)
-        ss.embeddings_df, ss.faiss_index = initialize_vdb(temp_file_paths)
+    if update_vdb:
+        if not added_files:
+            ss.description.empty()
+            st.write("🤯 Please upload your file(s) first.")
+        else:
+            time.sleep(0.2)
+            temp_file_paths = initialize_file(added_files)
+            ss.embeddings_df, ss.faiss_index = initialize_vdb(temp_file_paths)
 
     if btn_next:
         if api_key != "sk-..." and api_key !="" and api_key.startswith("sk-"):
@@ -468,7 +473,6 @@ def app():
                 st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
                 with st.chat_message("assistant"):
                     st.write("Hello👋, how can I help you today? 😄")
-
         else:
             ss.description.empty()
             st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
@@ -526,9 +530,7 @@ def app():
                         model=ss["openai_model"]
                     )
                 ss.messages.append({"role": "assistant", "content": full_response})
-                ss.messages_ui.append({"role": "assistant", "content": full_response}) 
-
-    
+                ss.messages_ui.append({"role": "assistant", "content": full_response})
 
 if __name__ == "__main__":
     app()
