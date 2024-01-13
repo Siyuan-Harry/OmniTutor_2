@@ -388,7 +388,7 @@ def app():
             ss["openai_model"] = 'gpt-3.5-turbo-1106'
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
         added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
-        update_vdb = st.button("Okay, start process my files! ⏩️", type="primary")
+        update_vdb = st.button("Okay, start process my files! ⏩️")
         with st.expander('⚙️ Customize my course'):
             num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
             custom_options = st.multiselect(
