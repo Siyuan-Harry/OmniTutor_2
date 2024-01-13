@@ -471,7 +471,7 @@ def app():
 
         else:
             ss.description.empty()
-            st.write("请输入正确的OpenAI API Key令牌")
+            st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
 
     if user_question:
         ss.description.empty()
