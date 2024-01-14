@@ -403,7 +403,7 @@ def display_current_status_description():
 
 def display_current_status_col1():
     if ss.course_outline_list == []:
-        display_description(True)
+        display_current_status_description()
     elif ss.course_outline_list != [] and ss.course_content_list == []:
         regenerate_outline(ss.course_outline_list)
     else:
@@ -412,35 +412,17 @@ def display_current_status_col1():
     
 def display_current_status_col2():
     st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
-
     with st.chat_message("assistant"):
         st.markdown("Hello👋, how can I help you today? 😄")
-    for message in ss.messages_ui:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    if ss.messages_ui != []:
+        for message in ss.messages_ui:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+    else:
+        pass
 
 def app():
-    st.title("OmniTutor 2.0")
-    st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
-    st.markdown("""
-        <style>
-            .footer {
-                position: fixed;
-                bottom: 0;
-                right: 10px;
-                width: auto;
-                background-color: transparent;
-                text-align: right;
-                padding-right: 10px;
-                padding-bottom: 10px;
-            }
-        </style>
-        <div class="footer">Made with 🧡 by Siyuan</div>
-    """, unsafe_allow_html=True)
-    
     initialize_session_state()
-
-    display_current_status_description()
     
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
@@ -459,6 +441,26 @@ def app():
             ss.language = 'English'
             Chinese = st.checkbox('Output in Chinese')
         btn_next = st.button('Okay, next learning step! ⏩️')
+    
+    st.title("OmniTutor 2.0")
+    st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
+    st.markdown("""
+        <style>
+            .footer {
+                position: fixed;
+                bottom: 0;
+                right: 10px;
+                width: auto;
+                background-color: transparent;
+                text-align: right;
+                padding-right: 10px;
+                padding-bottom: 10px;
+            }
+        </style>
+        <div class="footer">Made with 🧡 by Siyuan</div>
+    """, unsafe_allow_html=True)
+    
+    display_current_status_description()
     
     user_question = st.chat_input("Enter your questions when learning...")
     
@@ -563,7 +565,7 @@ def app():
                             )
                             ss.course_content_list.append(new_lesson)
                         else:
-                            display_current_status()
+                            display_current_status_col1()
                             break
                 else:
                     regenerate_outline(ss.course_outline_list)
@@ -583,6 +585,7 @@ def app():
                             )
                             ss.course_content_list.append(new_lesson)
                         else:
+                            display_current_status_col1()
                             break
             with col2:
                 display_current_status_col2()
