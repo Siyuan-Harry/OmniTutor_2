@@ -595,9 +595,9 @@ def app():
         display_description(False)
         if ss["OPENAI_API_KEY"] != '':
             if ss.embeddings_df == '' or ss.faiss_index == '':
-                warning_user_question = st.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
+                warning_upload_materials = st.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
                 time.sleep(2)
-                warning_user_question.empty()
+                warning_upload_materials.empty()
                 display_description(True)
             else:
                 client = OpenAI(api_key = ss["OPENAI_API_KEY"])
@@ -639,8 +639,9 @@ def app():
                     ss.messages.append({"role": "assistant", "content": full_response})
                     ss.messages_ui.append({"role": "assistant", "content": full_response})
         else:
-            st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
+            warning_api_key = st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
             time.sleep(2)
+            warning_api_key.empty()
 
 
 if __name__ == "__main__":
