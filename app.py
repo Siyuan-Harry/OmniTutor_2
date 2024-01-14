@@ -355,9 +355,11 @@ def initialize_session_state():
         ss.language = ''
     if "style_options" not in ss:
         ss.style_options = ''
-    
+
     if "start_learning" not in ss:
         ss.start_learning = 0
+    if "is_displaying_description" not in ss:
+        ss.is_displaying_description = 0
 
 def display_description(visible):
     description = """
@@ -382,13 +384,14 @@ def display_description(visible):
                                 
         🎉 Have fun playing with Omnitutor!                                                                                                              
         """
+    
     write_description = st.empty()
-
-    if visible:
+    if visible and ss.is_displaying_description == 0:
         write_description.markdown(description, unsafe_allow_html=True)
+        ss.is_displaying_description = 1
     else:
         write_description.empty()
-
+        ss.is_displaying_description = 0
 
 def display_current_status_description():
     if ss.embeddings_df != '' or ss.faiss_index != '':
@@ -560,7 +563,7 @@ def app():
                             )
                             ss.course_content_list.append(new_lesson)
                         else:
-                            #display_current_status
+                            display_current_status()
                             break
                 else:
                     regenerate_outline(ss.course_outline_list)
