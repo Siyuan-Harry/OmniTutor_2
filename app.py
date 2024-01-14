@@ -386,8 +386,8 @@ def display_description(visible):
         """
     
     write_description = st.empty()
+    write_description.markdown(description, unsafe_allow_html=True)
     if visible and ss.is_displaying_description == 0:
-        write_description.markdown(description, unsafe_allow_html=True)
         ss.is_displaying_description = 1
     else:
         write_description.empty()
