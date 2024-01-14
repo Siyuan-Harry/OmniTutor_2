@@ -126,7 +126,7 @@ def genarating_outline(client, keywords, num_lessons, language, model):
     try:
         list_response = eval(response)
     except SyntaxError:
-        st.write('🤯Oops.. We encountered an error generating the outline of your course. Please try again.')
+        st.markdown('🤯Oops.. We encountered an error generating the outline of your course. Please try again.')
         pass
     return list_response
 
@@ -268,7 +268,7 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
         course_outline_string += f"{lessons_count}." + outline[0]
         course_outline_string += '\n\n' + outline[1] + '\n\n'
     with st.expander("Check the course outline", expanded=False):
-        st.write(course_outline_string)
+        st.markdown(course_outline_string)
     return course_outline_list
 
 def visualize_new_content(client, count_generating_content, lesson_description, embeddings_df, faiss_index, language, style_options, model):
@@ -293,9 +293,9 @@ def regenerate_outline(course_outline_list):
             course_outline_string += f"**{lessons_count}. {outline[0]}**"
             course_outline_string += f"\n\n    {outline[1]} \n\n"
         with st.expander("Check the course outline", expanded=False):
-            st.write(course_outline_string)
+            st.markdown(course_outline_string)
     except Exception:
-        st.write('🤯Oops.. We encountered an error. Please try again.')
+        st.markdown('🤯Oops.. We encountered an error. Please try again.')
         pass
 
 def regenerate_content(course_content_list):
@@ -306,7 +306,7 @@ def regenerate_content(course_content_list):
             with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
                 st.markdown(content)
     except Exception:
-        st.write('🤯Oops.. We encountered an error. Please try again.')
+        st.markdown('🤯Oops.. We encountered an error. Please try again.')
         pass
 
 def add_prompt_course_style(selected_style_list):
@@ -383,7 +383,7 @@ def display_current_status_col2():
     st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
     with st.chat_message("assistant"):
-        st.write("Hello👋, how can I help you today? 😄")
+        st.markdown("Hello👋, how can I help you today? 😄")
     for message in ss.messages_ui:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
@@ -469,12 +469,12 @@ def app():
             time.sleep(0.1)
             ss.description.empty()
             ss["OPENAI_API_KEY"] = api_key
-            st.write("✅ API Key saved successfully.")
+            st.markdown("✅ API Key saved successfully.")
             time.sleep(2)
             ss.description
         else:
             ss.description.empty()
-            st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
+            st.markdown("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
     
     if added_files:
         if ss.start_learning == 0:
@@ -522,7 +522,7 @@ def app():
     if update_vdb:
         if not added_files:
             ss.description.empty()
-            st.write("🤯 Please upload your file(s) first.")
+            st.markdown("🤯 Please upload your file(s) first.")
         else:
             time.sleep(0.2)
             ss.temp_file_paths = initialize_file(added_files)
@@ -579,14 +579,14 @@ def app():
                 display_current_status_col2()
         else:
             ss.description.empty()
-            st.write("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
+            st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
 
     if user_question:
         ss.start_learning = 1
         ss.description.empty()
         if ss["OPENAI_API_KEY"] != '':
             if ss.embeddings_df == '' or ss.faiss_index == '':
-                warning_user_question = st.write('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
+                warning_user_question = st.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
                 time.sleep(2)
                 warning_user_question.empty()
                 ss.description
@@ -600,7 +600,7 @@ def app():
                     st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
                     with st.chat_message("assistant"):
-                        st.write("Hello👋, how can I help you today? 😄")
+                        st.markdown("Hello👋, how can I help you today? 😄")
 
                     # Display chat messages from history on app rerun
                     for message in ss.messages_ui:
@@ -630,7 +630,7 @@ def app():
                     ss.messages.append({"role": "assistant", "content": full_response})
                     ss.messages_ui.append({"role": "assistant", "content": full_response})
         else:
-            st.write("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
+            st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
             time.sleep(2)
 
 
