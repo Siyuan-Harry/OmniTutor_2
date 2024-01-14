@@ -436,6 +436,7 @@ def app():
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
         use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
+        save_key = st.button("Okay, save my API key! ⏩️")
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
         added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
         update_vdb = st.button("Okay, start process my files! ⏩️")
@@ -451,18 +452,6 @@ def app():
         btn_next = st.button('Okay, next learning step! ⏩️')
     
     user_question = st.chat_input("Enter your questions when learning...")
-
-    if api_key:
-        if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
-            time.sleep(0.2)
-            ss.description.empty()
-            ss["OPENAI_API_KEY"] = api_key
-            st.write("✅ API Key saved successfully.")
-            time.sleep(2)
-            ss.description
-        else:
-            ss.description.empty()
-            st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
     
     if use_35:
         ss["openai_model"] = 'gpt-3.5-turbo-1106'
@@ -474,6 +463,18 @@ def app():
                 display_current_status_col1()
             with col2:
                 display_current_status_col2()
+    
+    if save_key:
+        if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
+            time.sleep(0.1)
+            ss.description.empty()
+            ss["OPENAI_API_KEY"] = api_key
+            st.write("✅ API Key saved successfully.")
+            time.sleep(2)
+            ss.description
+        else:
+            ss.description.empty()
+            st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
     
     if added_files:
         if ss.start_learning == 0:
