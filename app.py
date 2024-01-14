@@ -327,6 +327,8 @@ def initialize_session_state():
     """
     All variables needed to be stored across reruns
     """
+    if "temp_file_paths" not in ss:
+        ss.temp_file_paths = ''
     if "embeddings_df" not in ss:
         ss.embeddings_df = ''
     if "faiss_index" not in ss:
@@ -522,8 +524,8 @@ def app():
             st.write("🤯 Please upload your file(s) first.")
         else:
             time.sleep(0.2)
-            temp_file_paths = initialize_file(added_files)
-            ss.embeddings_df, ss.faiss_index = initialize_vdb(temp_file_paths)
+            ss.temp_file_paths = initialize_file(added_files)
+            ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
 
     if btn_next:
         ss.start_learning = 1
@@ -533,7 +535,7 @@ def app():
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 if ss.course_outline_list == []:
-                    ss.course_outline_list = initialize_outline(client, temp_file_paths, num_lessons, ss.language, ss["openai_model"])
+                    ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
                     for lesson_description in ss.course_outline_list:
