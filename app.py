@@ -274,7 +274,14 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
 def visualize_new_content(client, count_generating_content, lesson_description, embeddings_df, faiss_index, language, style_options, model):
     retrievedChunksList = searchVDB(lesson_description, embeddings_df, faiss_index)
     with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
-        courseContent = write_one_lesson(client, lesson_description, retrievedChunksList, language, style_options, model)
+        courseContent = write_one_lesson(
+            client, 
+            lesson_description, 
+            retrievedChunksList, 
+            language, 
+            style_options, 
+            model
+        )
     return courseContent
 
 def regenerate_outline(course_outline_list):
@@ -340,28 +347,44 @@ def initialize_session_state():
     if "messages" not in ss:
         ss.messages = []
 
+    if "description" not in ss:
+        ss.description = ''
+    if "num_lessons" not in ss:
+        ss.num_lessons = ''
     if "language" not in ss:
         ss.language = ''
     if "style_options" not in ss:
         ss.style_options = ''
+    
+    if "start_learning" not in ss:
+        ss.start_learning = 0
 
-#def display_interact()
-def display_interact():
-    col1, col2 = st.columns([0.6,0.4])
-    with col1:
-        if ss.course_outline_list == []:
-            ss.description
-        elif ss.course_outline_list != [] and ss.course_content_list == []:
-            regenerate_outline(ss.course_outline_list)
-        else:
-            regenerate_outline(ss.course_outline_list)
-            regenerate_content(ss.course_content_list)
-        
-    with col2:
-        st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+def display_current_status_description():
+    if ss.embeddings_df != '' or ss.faiss_index != '':
+        ss.description
+        st.success('Processing file...Done')
+        st.success("Constructing vector database from provided materials...Done")
+    else:
+         ss.description
+    
 
-        with st.chat_message("assistant"):
-            st.write("Hello👋, how can I help you today? 😄")
+def display_current_status_col1():
+    if ss.course_outline_list == []:
+        ss.description
+    elif ss.course_outline_list != [] and ss.course_content_list == []:
+        regenerate_outline(ss.course_outline_list)
+    else:
+        regenerate_outline(ss.course_outline_list)
+        regenerate_content(ss.course_content_list)
+    
+def display_current_status_col2():
+    st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+
+    with st.chat_message("assistant"):
+        st.write("Hello👋, how can I help you today? 😄")
+    for message in ss.messages_ui:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
 def app():
     st.title("OmniTutor 2.0")
@@ -381,28 +404,7 @@ def app():
         </style>
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
-    with st.sidebar:
-        api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
-        use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
-        if use_35:
-            ss["openai_model"] = 'gpt-3.5-turbo-1106'
-        st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
-        added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
-        update_vdb = st.button("Okay, start process my files! ⏩️")
-        with st.expander('⚙️ Customize my course'):
-            num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
-            custom_options = st.multiselect(
-                'Preferred teaching style :grey[(Recommend new users not to select)]',
-                ['More examples', 'More excercises', 'Easier to learn'],
-                max_selections = 2
-            )
-            ss.style_options = add_prompt_course_style(custom_options)
-            ss.language = 'English'
-            Chinese = st.checkbox('Output in Chinese')
-            if Chinese:
-                ss.language = 'Chinese'
-        btn_next = st.button('Okay, next learning step! ⏩️')
-
+    
     initialize_session_state()
 
     ss.description = st.markdown('''
@@ -425,12 +427,94 @@ def app():
         4. **Start course generating**: <font color = 'grey'>Touch "Generate my course!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
         5. **Interactive learning**: <font color = 'grey'>Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.</font>
                                 
-        🎉 Have fun playing with Omnitutor!
-                                                                                                                                       
+        🎉 Have fun playing with Omnitutor!                                                                                                              
         ''', unsafe_allow_html=True
         )
     
+    with st.sidebar:
+        api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
+        use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
+        st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
+        added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
+        update_vdb = st.button("Okay, start process my files! ⏩️")
+        with st.expander('⚙️ Customize my course'):
+            num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
+            custom_options = st.multiselect(
+                'Preferred teaching style :grey[(Recommend new users not to select)]',
+                ['More examples', 'More excercises', 'Easier to learn'],
+                max_selections = 2
+            )
+            ss.language = 'English'
+            Chinese = st.checkbox('Output in Chinese')
+        btn_next = st.button('Okay, next learning step! ⏩️')
+    
     user_question = st.chat_input("Enter your questions when learning...")
+
+    if api_key:
+        if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
+            time.sleep(0.2)
+            ss.description.empty()
+            ss["OPENAI_API_KEY"] = api_key
+            st.write("✅ API Key saved successfully.")
+            time.sleep(2)
+            ss.description
+        else:
+            ss.description.empty()
+            st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
+    
+    if use_35:
+        ss["openai_model"] = 'gpt-3.5-turbo-1106'
+        if ss.start_learning == 0:
+            display_current_status_description()
+        else:
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1()
+            with col2:
+                display_current_status_col2()
+    
+    if added_files:
+        if ss.start_learning == 0:
+            display_current_status_description()
+        else:
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1()
+            with col2:
+                display_current_status_col2()
+
+    if num_lessons:
+        ss.num_lessons = num_lessons
+        if ss.start_learning == 0:
+            display_current_status_description()
+        else:
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1()
+            with col2:
+                display_current_status_col2()
+        
+    if custom_options:
+        ss.style_options = add_prompt_course_style(custom_options)
+        if ss.start_learning == 0:
+            display_current_status_description()
+        else:
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1()
+            with col2:
+                display_current_status_col2()
+    
+    if Chinese:
+        ss.language = 'Chinese'
+        if ss.start_learning == 0:
+            display_current_status_description()
+        else:
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1()
+            with col2:
+                display_current_status_col2()
 
     if update_vdb:
         if not added_files:
@@ -442,9 +526,9 @@ def app():
             ss.embeddings_df, ss.faiss_index = initialize_vdb(temp_file_paths)
 
     if btn_next:
-        if api_key != "sk-..." and api_key !="" and api_key.startswith("sk-"):
-            ss.description.empty()
-            ss["OPENAI_API_KEY"] = api_key
+        ss.start_learning = 1
+        ss.description.empty()
+        if ss["OPENAI_API_KEY"] != '':
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             col1, col2 = st.columns([0.6,0.4])
             with col1:
@@ -453,84 +537,99 @@ def app():
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
                     for lesson_description in ss.course_outline_list:
-                        ss.lesson_counter += 1
-                        new_lesson = visualize_new_content(
-                            client, 
-                            ss.lesson_counter, 
-                            lesson_description, 
-                            ss.embeddings_df, 
-                            ss.faiss_index, 
-                            ss.language, 
-                            ss.style_options, 
-                            ss["openai_model"]
-                        )
-                        ss.course_content_list.append(new_lesson)
+                        if ss.lesson_counter < ss.num_lessons:
+                            ss.lesson_counter += 1
+                            new_lesson = visualize_new_content(
+                                client, 
+                                ss.lesson_counter, 
+                                lesson_description, 
+                                ss.embeddings_df, 
+                                ss.faiss_index, 
+                                ss.language, 
+                                ss.style_options, 
+                                ss["openai_model"]
+                            )
+                            ss.course_content_list.append(new_lesson)
+                        else:
+                            #display_current_status
+                            break
                 else:
                     regenerate_outline(ss.course_outline_list)
                     regenerate_content(ss.course_content_list)
-                    #visualize_new_content
+                    for lesson_description in ss.course_outline_list:
+                        if ss.lesson_counter < ss.num_lessons:
+                            ss.lesson_counter += 1
+                            new_lesson = visualize_new_content(
+                                client, 
+                                ss.lesson_counter, 
+                                lesson_description, 
+                                ss.embeddings_df, 
+                                ss.faiss_index, 
+                                ss.language, 
+                                ss.style_options, 
+                                ss["openai_model"]
+                            )
+                            ss.course_content_list.append(new_lesson)
+                        else:
+                            break
             with col2:
-                st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
-                with st.chat_message("assistant"):
-                    st.write("Hello👋, how can I help you today? 😄")
+                display_current_status_col2()
         else:
             ss.description.empty()
-            st.write("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
+            st.write("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
 
     if user_question:
+        ss.start_learning = 1
         ss.description.empty()
-        if ss.embeddings_df == '' or ss.faiss_index == '':
-            warning_user_question = st.write('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
-            time.sleep(2)
-            warning_user_question.empty()
-            ss.description
+        if ss["OPENAI_API_KEY"] != '':
+            if ss.embeddings_df == '' or ss.faiss_index == '':
+                warning_user_question = st.write('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
+                time.sleep(2)
+                warning_user_question.empty()
+                ss.description
+            else:
+                client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+                col1, col2 = st.columns([0.6,0.4])
+                with col1:
+                    display_current_status_col1()
+                    
+                with col2:
+                    st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+
+                    with st.chat_message("assistant"):
+                        st.write("Hello👋, how can I help you today? 😄")
+
+                    # Display chat messages from history on app rerun
+                    for message in ss.messages_ui:
+                        with st.chat_message(message["role"]):
+                            st.markdown(message["content"])
+                    
+                    #更新ui上显示的聊天记录
+                    ss.messages_ui.append({"role": "user", "content": user_question})
+                    # Display new user question.
+                    with st.chat_message("user"):
+                        st.markdown(user_question)
+
+                    retrieved_chunks_for_user = searchVDB(user_question, ss.embeddings_df, ss.faiss_index)
+                    prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
+                    ss.messages.append({"role": "user", "content": prompt})
+
+                    # Display assistant response in chat message container
+                    with st.chat_message("assistant"):
+                        full_response = get_visualize_stream_completion_from_messages(
+                            client,
+                            messages=[
+                                {"role": m["role"], "content": m["content"]}
+                                for m in st.session_state.messages #用chatbot那边的隐藏消息记录
+                            ],
+                            model=ss["openai_model"]
+                        )
+                    ss.messages.append({"role": "assistant", "content": full_response})
+                    ss.messages_ui.append({"role": "assistant", "content": full_response})
         else:
-            ss["OPENAI_API_KEY"] = api_key
-            client = OpenAI(api_key = ss["OPENAI_API_KEY"])
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                if ss.course_outline_list == []:
-                    ss.description
-                elif ss.course_outline_list != [] and ss.course_content_list == []:
-                    regenerate_outline(ss.course_outline_list)
-                else:
-                    regenerate_outline(ss.course_outline_list)
-                    regenerate_content(ss.course_content_list)
-                
-            with col2:
-                st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+            st.write("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
+            time.sleep(2)
 
-                with st.chat_message("assistant"):
-                    st.write("Hello👋, how can I help you today? 😄")
-
-                # Display chat messages from history on app rerun
-                for message in ss.messages_ui:
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
-                
-                #更新ui上显示的聊天记录
-                ss.messages_ui.append({"role": "user", "content": user_question})
-                # Display new user question.
-                with st.chat_message("user"):
-                    st.markdown(user_question)
-
-                #这里的session.state就是保存了这个对话会话的一些基本信息和设置
-                retrieved_chunks_for_user = searchVDB(user_question, ss.embeddings_df, ss.faiss_index)
-                prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
-                ss.messages.append({"role": "user", "content": prompt})
-
-                # Display assistant response in chat message container
-                with st.chat_message("assistant"):
-                    full_response = get_visualize_stream_completion_from_messages(
-                        client,
-                        messages=[
-                            {"role": m["role"], "content": m["content"]}
-                            for m in st.session_state.messages #用chatbot那边的隐藏消息记录
-                        ],
-                        model=ss["openai_model"]
-                    )
-                ss.messages.append({"role": "assistant", "content": full_response})
-                ss.messages_ui.append({"role": "assistant", "content": full_response})
 
 if __name__ == "__main__":
     app()
