@@ -507,7 +507,8 @@ def app():
             write_description.markdown(description, unsafe_allow_html=True)
         else:
             write_description.empty()
-            st.markdown("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
+            display_warning_api_key()
+            write_description.markdown(description, unsafe_allow_html=True)
     
     if added_files:
         display_current_status(write_description, description)
