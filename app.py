@@ -231,8 +231,9 @@ def decorate_user_question(user_question, retrieved_chunks_for_user):
     return decorated_prompt
 
 def initialize_file(added_files):
+    global success_file
     temp_file_paths = []
-    with st.spinner('Processing file...'):
+    with st.spinner('Processing file(s)...'):
         for added_file in added_files:
             if added_file.name.endswith(".pdf"):
                 string = pdf_parser(added_file)
@@ -245,15 +246,18 @@ def initialize_file(added_files):
                     tmp_path = tmp.name
             temp_file_paths.append(tmp_path)
     #success_outline = 
-    st.success('Processing file...Done')
+    success_file = st.empty()
+    success_file.success('Processing file(s)...Done')
     #time.sleep(0.5)
     #success_outline.empty()
     return temp_file_paths
 
 def initialize_vdb(temp_file_paths):
+    global success_vdb
     with st.spinner('Constructing vector database from provided materials...'):
         embeddings_df, faiss_index = constructVDB(temp_file_paths)
-    st.success("Constructing vector database from provided materials...Done")
+    success_vdb = st.empty()
+    success_vdb.success("Constructing vector database from provided materials...Done")
     return embeddings_df, faiss_index
 
 def initialize_outline(client, temp_file_paths, num_lessons, language, model):
@@ -326,6 +330,8 @@ def add_prompt_course_style(selected_style_list):
                 customize_prompt += '- **Be easier to learn**. So you should use plain language to write the lesson script, and apply some metaphors & analogys wherever appropriate.\n'
     return customize_prompt
 
+
+
 def initialize_session_state():
     """
     All variables needed to be stored across reruns
@@ -364,50 +370,14 @@ def initialize_session_state():
     if "is_displaying_description" not in ss:
         ss.is_displaying_description = 0
 
-def display_description(visible):
-    global write_description
-    description = """
-        <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
-        
-        Github Repo: https://github.com/Siyuan-Harry/OmniTutor 
-
-        ### ✨ Key features                                           
-                                                   
-        - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
-        - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
-        - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
-        - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
-        
-        ### 🏃‍♂️ Get started!
-                                                    
-        1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
-        2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
-        3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
-        4. **Start course generating**: <font color = 'grey'>Touch "Generate my course!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
-        5. **Interactive learning**: <font color = 'grey'>Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.</font>
-                                
-        🎉 Have fun playing with Omnitutor!                                                                                                              
-        """
-    
-    write_description = st.empty()
-    write_description.markdown(description, unsafe_allow_html=True)
-    if visible and ss.is_displaying_description == 0:
-        ss.is_displaying_description = 1
-    else:
-        write_description.empty()
-        ss.is_displaying_description = 0
-
-def display_current_status_description():
-    if ss.embeddings_df != '' or ss.faiss_index != '':
-        display_description(True)
-        st.success('Processing file...Done')
-        st.success("Constructing vector database from provided materials...Done")
-    else:
-        display_description(True)
-
-def display_current_status_col1():
+def display_current_status_col1(write_description, description):
     if ss.course_outline_list == []:
-        display_current_status_description()
+            if ss.embeddings_df != '' or ss.faiss_index != '':
+                write_description.markdown(description, unsafe_allow_html=True)
+                st.success('Processing file...Done')
+                st.success("Constructing vector database from provided materials...Done")
+            else:
+                write_description.markdown(description, unsafe_allow_html=True)
     elif ss.course_outline_list != [] and ss.course_content_list == []:
         regenerate_outline(ss.course_outline_list)
     else:
@@ -425,18 +395,37 @@ def display_current_status_col2():
     else:
         pass
 
-"""
-def clean_screen_col1():
-    if ss.course_outline_list == []:
+def display_current_status(write_description, description):
+    if ss.start_learning == 0 and ss.faiss_index != '':
+        success_file.success('Processing file(s)...Done')
+        success_vdb.success("Constructing vector database from provided materials...Done")
+    elif ss.start_learning == 1:
+        success_file.empty()
+        success_vdb.empty()
         write_description.empty()
-    elif ss.course_outline_list != [] and ss.course_content_list == []:
+        col1, col2 = st.columns([0.6,0.4])
+        with col1:
+            display_current_status_col1(write_description, description)
+        with col2:
+            display_current_status_col2()
 
-    else:
-        regenerate_outline(ss.course_outline_list)
-        regenerate_content(ss.course_content_list)
+def display_warning_api_key():
+    warning_api_key = st.empty()
+    warning_api_key.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
+    time.sleep(2)
+    warning_api_key.empty()
 
-def clean_screen_col2():
-"""
+def display_warning_upload_materials():
+    warning_upload_materials = st.empty()
+    warning_upload_materials.markdown("🤯 Please upload your file(s) first.")
+    time.sleep(2)
+    warning_upload_materials.empty()
+
+def display_warning_upload_materials_vdb():
+    warning_upload_materials_vdb = st.empty()
+    warning_upload_materials_vdb.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
+    time.sleep(2)
+    warning_upload_materials_vdb.empty()
 
 def app():
     initialize_session_state()
@@ -506,14 +495,7 @@ def app():
     
     if use_35:
         ss["openai_model"] = 'gpt-3.5-turbo-1106'
-        if ss.start_learning == 0:
-            display_current_status_description()
-        else:
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                display_current_status_col1()
-            with col2:
-                display_current_status_col2()
+        display_current_status(write_description, description)
     
     if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
@@ -528,61 +510,46 @@ def app():
             st.markdown("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
     
     if added_files:
-        if ss.start_learning == 0:
-            display_current_status_description()
-        else:
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                display_current_status_col1()
-            with col2:
-                display_current_status_col2()
+        display_current_status(write_description, description)
 
     if num_lessons:
         ss.num_lessons = num_lessons
-        if ss.start_learning == 0:
-            display_current_status_description()
-        else:
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                display_current_status_col1()
-            with col2:
-                display_current_status_col2()
+        display_current_status(write_description, description)
         
     if custom_options:
         ss.style_options = add_prompt_course_style(custom_options)
-        if ss.start_learning == 0:
-            display_current_status_description()
-        else:
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                display_current_status_col1()
-            with col2:
-                display_current_status_col2()
+        display_current_status(write_description, description)
     
     if Chinese:
         ss.language = 'Chinese'
-        if ss.start_learning == 0:
-            display_current_status_description()
-        else:
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                display_current_status_col1()
-            with col2:
-                display_current_status_col2()
+        display_current_status(write_description, description)
 
     if update_vdb:
         if not added_files:
-            
-            st.markdown("🤯 Please upload your file(s) first.")
+            if ss.start_learning == 0:
+                write_description.empty()
+                display_warning_upload_materials()
+                write_description.markdown(description, unsafe_allow_html=True)
+            elif ss.start_learning == 1:
+                display_warning_upload_materials()
+                display_current_status(write_description, description)
         else:
             time.sleep(0.2)
+            display_current_status(write_description, description)
             ss.temp_file_paths = initialize_file(added_files)
             ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
+    
 
     if btn_next:
-        ss.start_learning = 1
         write_description.empty()
-        if ss["OPENAI_API_KEY"] != '':
+        if  len(ss["OPENAI_API_KEY"]) != 51:
+            display_warning_api_key()
+            display_current_status(write_description, description)
+        elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
+            display_warning_upload_materials_vdb()
+            display_current_status(write_description, description)
+        else:
+            ss.start_learning = 1
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             col1, col2 = st.columns([0.6,0.4])
             with col1:
@@ -604,8 +571,7 @@ def app():
                         ss.course_content_list.append(new_lesson)
                         ss.lesson_counter += 1
                     else:
-                        display_current_status_col1()
-                        
+                        display_current_status_col1(write_description, description)
                 else:
                     regenerate_outline(ss.course_outline_list)
                     regenerate_content(ss.course_content_list)
@@ -623,66 +589,59 @@ def app():
                         ss.course_content_list.append(new_lesson)
                         ss.lesson_counter += 1
                     else:
-                        display_current_status_col1()
-                    
+                        display_current_status_col1(write_description, description)
             with col2:
                 display_current_status_col2()
-        else:
-            write_description.empty()
-            st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
+            
 
     if user_question:
-        ss.start_learning = 1
         write_description.empty()
-        if ss["OPENAI_API_KEY"] != '':
-            if ss.embeddings_df == '' or ss.faiss_index == '':
-                warning_upload_materials = st.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
-                time.sleep(2)
-                warning_upload_materials.empty()
-                display_description(True)
-            else:
-                client = OpenAI(api_key = ss["OPENAI_API_KEY"])
-                col1, col2 = st.columns([0.6,0.4])
-                with col1:
-                    display_current_status_col1()
-                    
-                with col2:
-                    st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
-
-                    with st.chat_message("assistant"):
-                        st.markdown("Hello👋, how can I help you today? 😄")
-
-                    # Display chat messages from history on app rerun
-                    for message in ss.messages_ui:
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-                    
-                    #更新ui上显示的聊天记录
-                    ss.messages_ui.append({"role": "user", "content": user_question})
-                    # Display new user question.
-                    with st.chat_message("user"):
-                        st.markdown(user_question)
-
-                    retrieved_chunks_for_user = searchVDB(user_question, ss.embeddings_df, ss.faiss_index)
-                    prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
-                    ss.messages.append({"role": "user", "content": prompt})
-
-                    # Display assistant response in chat message container
-                    with st.chat_message("assistant"):
-                        full_response = get_visualize_stream_completion_from_messages(
-                            client,
-                            messages=[
-                                {"role": m["role"], "content": m["content"]}
-                                for m in st.session_state.messages #用chatbot那边的隐藏消息记录
-                            ],
-                            model=ss["openai_model"]
-                        )
-                    ss.messages.append({"role": "assistant", "content": full_response})
-                    ss.messages_ui.append({"role": "assistant", "content": full_response})
+        if len(ss["OPENAI_API_KEY"]) != 51:
+            display_warning_api_key()
+            display_current_status(write_description, description)
+        elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
+            display_warning_upload_materials_vdb()
+            display_current_status(write_description, description)
         else:
-            warning_api_key = st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
-            time.sleep(2)
-            warning_api_key.empty()
+            ss.start_learning = 1
+            client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1(write_description, description)
+                
+            with col2:
+                st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+
+                with st.chat_message("assistant"):
+                    st.markdown("Hello👋, how can I help you today? 😄")
+
+                # Display chat messages from history on app rerun
+                for message in ss.messages_ui:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+                
+                #更新ui上显示的聊天记录
+                ss.messages_ui.append({"role": "user", "content": user_question})
+                # Display new user question.
+                with st.chat_message("user"):
+                    st.markdown(user_question)
+
+                retrieved_chunks_for_user = searchVDB(user_question, ss.embeddings_df, ss.faiss_index)
+                prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
+                ss.messages.append({"role": "user", "content": prompt})
+
+                # Display assistant response in chat message container
+                with st.chat_message("assistant"):
+                    full_response = get_visualize_stream_completion_from_messages(
+                        client,
+                        messages=[
+                            {"role": m["role"], "content": m["content"]}
+                            for m in st.session_state.messages #用chatbot那边的隐藏消息记录
+                        ],
+                        model=ss["openai_model"]
+                    )
+                ss.messages.append({"role": "assistant", "content": full_response})
+                ss.messages_ui.append({"role": "assistant", "content": full_response})
 
 
 if __name__ == "__main__":
