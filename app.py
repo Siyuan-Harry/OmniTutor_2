@@ -231,7 +231,6 @@ def decorate_user_question(user_question, retrieved_chunks_for_user):
     return decorated_prompt
 
 def initialize_file(added_files):
-    global success_file
     temp_file_paths = []
     with st.spinner('Processing file(s)...'):
         for added_file in added_files:
@@ -250,15 +249,14 @@ def initialize_file(added_files):
     success_file.success('Processing file(s)...Done')
     #time.sleep(0.5)
     #success_outline.empty()
-    return temp_file_paths
+    return temp_file_paths, success_file
 
 def initialize_vdb(temp_file_paths):
-    global success_vdb
     with st.spinner('Constructing vector database from provided materials...'):
         embeddings_df, faiss_index = constructVDB(temp_file_paths)
     success_vdb = st.empty()
     success_vdb.success("Constructing vector database from provided materials...Done")
-    return embeddings_df, faiss_index
+    return embeddings_df, faiss_index, success_vdb
 
 def initialize_outline(client, temp_file_paths, num_lessons, language, model):
     with st.spinner('Generating Course Outline...'):
@@ -289,7 +287,6 @@ def visualize_new_content(client, count_generating_content, lesson_description, 
     return courseContent
 
 def regenerate_outline(course_outline_list):
-    global write_course_outline
     try:
         course_outline_string = ''
         lessons_count = 0
@@ -305,7 +302,6 @@ def regenerate_outline(course_outline_list):
         pass
 
 def regenerate_content(course_content_list):
-
     try:
         count_generating_content = 0
         for content in course_content_list:
@@ -329,8 +325,6 @@ def add_prompt_course_style(selected_style_list):
             elif style == "Easier to learn":
                 customize_prompt += '- **Be easier to learn**. So you should use plain language to write the lesson script, and apply some metaphors & analogys wherever appropriate.\n'
     return customize_prompt
-
-
 
 def initialize_session_state():
     """
@@ -395,7 +389,7 @@ def display_current_status_col2():
     else:
         pass
 
-def display_current_status(write_description, description):
+def display_current_status(write_description, description, success_file, success_vdb):
     if ss.start_learning == 0 and ss.faiss_index != '':
         success_file.success('Processing file(s)...Done')
         success_vdb.success("Constructing vector database from provided materials...Done")
@@ -495,7 +489,12 @@ def app():
     
     if use_35:
         ss["openai_model"] = 'gpt-3.5-turbo-1106'
-        display_current_status(write_description, description)
+        display_current_status(
+            write_description, 
+            description, 
+            success_file, 
+            success_vdb
+        )
     
     if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
@@ -513,19 +512,39 @@ def app():
             write_description.markdown(description, unsafe_allow_html=True)
     
     if added_files:
-        display_current_status(write_description, description)
+        display_current_status(
+            write_description, 
+            description, 
+            success_file, 
+            success_vdb
+        )
 
     if num_lessons:
         ss.num_lessons = num_lessons
-        display_current_status(write_description, description)
+        display_current_status(
+            write_description, 
+            description, 
+            success_file, 
+            success_vdb
+        )
         
     if custom_options:
         ss.style_options = add_prompt_course_style(custom_options)
-        display_current_status(write_description, description)
+        display_current_status(
+            write_description, 
+            description, 
+            success_file, 
+            success_vdb
+        )
     
     if Chinese:
         ss.language = 'Chinese'
-        display_current_status(write_description, description)
+        display_current_status(
+            write_description, 
+            description, 
+            success_file, 
+            success_vdb
+        )
 
     if update_vdb:
         if not added_files:
@@ -535,22 +554,42 @@ def app():
                 write_description.markdown(description, unsafe_allow_html=True)
             elif ss.start_learning == 1:
                 display_warning_upload_materials()
-                display_current_status(write_description, description)
+                display_current_status(
+                    write_description, 
+                    description, 
+                    success_file, 
+                    success_vdb
+                )
         else:
             time.sleep(0.2)
-            display_current_status(write_description, description)
-            ss.temp_file_paths = initialize_file(added_files)
-            ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
+            display_current_status(
+                write_description, 
+                description, 
+                success_file, 
+                success_vdb
+            )
+            ss.temp_file_paths, success_file = initialize_file(added_files)
+            ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths)
     
 
     if btn_next:
         write_description.empty()
         if  len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
-            display_current_status(write_description, description)
+            display_current_status(
+                write_description, 
+                description, 
+                success_file, 
+                success_vdb
+            )
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
-            display_current_status(write_description, description)
+            display_current_status(
+                write_description, 
+                description, 
+                success_file, 
+                success_vdb
+            )
         else:
             ss.start_learning = 1
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
@@ -595,16 +634,25 @@ def app():
                         display_current_status_col1(write_description, description)
             with col2:
                 display_current_status_col2()
-            
 
     if user_question:
         write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
-            display_current_status(write_description, description)
+            display_current_status(
+                write_description, 
+                description, 
+                success_file, 
+                success_vdb
+            )
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
-            display_current_status(write_description, description)
+            display_current_status(
+                write_description, 
+                description, 
+                success_file, 
+                success_vdb
+            )
         else:
             ss.start_learning = 1
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
