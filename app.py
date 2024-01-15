@@ -426,7 +426,6 @@ def initialize_empty_placeholders():
 
 def app():
     initialize_session_state()
-    success_file, success_vdb = initialize_empty_placeholders()
     
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
@@ -488,6 +487,7 @@ def app():
         """
     write_description = st.empty()
     write_description.markdown(description, unsafe_allow_html=True)
+    success_file, success_vdb = initialize_empty_placeholders()
     
     user_question = st.chat_input("Enter your questions when learning...")
     
@@ -575,7 +575,6 @@ def app():
             ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
             ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
-
     if btn_next:
         write_description.empty()
         if  len(ss["OPENAI_API_KEY"]) != 51:
