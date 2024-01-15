@@ -265,8 +265,8 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
     lessons_count = 0
     for outline in course_outline_list:
         lessons_count += 1
-        course_outline_string += f"{lessons_count}." + outline[0]
-        course_outline_string += '\n\n' + outline[1] + '\n\n'
+        course_outline_string += f"**{lessons_count}. {outline[0]}**"
+        course_outline_string += f"\n\n{outline[1]} \n\n"
     with st.expander("Check the course outline", expanded=False):
         st.markdown(course_outline_string)
     return course_outline_list
@@ -291,7 +291,7 @@ def regenerate_outline(course_outline_list):
         for outline in course_outline_list:
             lessons_count += 1
             course_outline_string += f"**{lessons_count}. {outline[0]}**"
-            course_outline_string += f"\n\n    {outline[1]} \n\n"
+            course_outline_string += f"\n\n{outline[1]} \n\n"
         write_course_outline = st.expander("Check the course outline", expanded=False)
         with write_course_outline:
             st.markdown(course_outline_string)
@@ -601,8 +601,10 @@ def app():
                 if ss.course_outline_list == []:
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
+                    #cleaner
                     regenerate_outline(ss.course_outline_list)
                     if ss.lesson_counter < ss.num_lessons:
+                        ss.lesson_counter += 1
                         new_lesson = visualize_new_content(
                             client, 
                             ss.lesson_counter, 
@@ -614,13 +616,13 @@ def app():
                             ss["openai_model"]
                         )
                         ss.course_content_list.append(new_lesson)
-                        ss.lesson_counter += 1
                     else:
                         display_current_status_col1(write_description, description)
                 else:
                     regenerate_outline(ss.course_outline_list)
                     regenerate_content(ss.course_content_list)
                     if ss.lesson_counter < ss.num_lessons:
+                        ss.lesson_counter += 1
                         new_lesson = visualize_new_content(
                             client, 
                             ss.lesson_counter, 
@@ -632,7 +634,6 @@ def app():
                             ss["openai_model"]
                         )
                         ss.course_content_list.append(new_lesson)
-                        ss.lesson_counter += 1
                     else:
                         display_current_status_col1(write_description, description)
             with col2:
