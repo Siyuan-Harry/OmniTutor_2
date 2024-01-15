@@ -285,6 +285,7 @@ def visualize_new_content(client, count_generating_content, lesson_description, 
     return courseContent
 
 def regenerate_outline(course_outline_list):
+    global write_course_outline
     try:
         course_outline_string = ''
         lessons_count = 0
@@ -292,13 +293,15 @@ def regenerate_outline(course_outline_list):
             lessons_count += 1
             course_outline_string += f"**{lessons_count}. {outline[0]}**"
             course_outline_string += f"\n\n    {outline[1]} \n\n"
-        with st.expander("Check the course outline", expanded=False):
+        write_course_outline = st.expander("Check the course outline", expanded=False)
+        with write_course_outline:
             st.markdown(course_outline_string)
     except Exception:
         st.markdown('🤯Oops.. We encountered an error. Please try again.')
         pass
 
 def regenerate_content(course_content_list):
+
     try:
         count_generating_content = 0
         for content in course_content_list:
@@ -362,6 +365,7 @@ def initialize_session_state():
         ss.is_displaying_description = 0
 
 def display_description(visible):
+    global write_description
     description = """
         <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
         
@@ -421,6 +425,19 @@ def display_current_status_col2():
     else:
         pass
 
+"""
+def clean_screen_col1():
+    if ss.course_outline_list == []:
+        write_description.empty()
+    elif ss.course_outline_list != [] and ss.course_content_list == []:
+
+    else:
+        regenerate_outline(ss.course_outline_list)
+        regenerate_content(ss.course_content_list)
+
+def clean_screen_col2():
+"""
+
 def app():
     initialize_session_state()
     
@@ -460,7 +477,30 @@ def app():
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
     
-    display_current_status_description()
+    description = """
+        <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
+        
+        Github Repo: https://github.com/Siyuan-Harry/OmniTutor 
+
+        ### ✨ Key features                                           
+                                                   
+        - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
+        - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
+        - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
+        - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
+        
+        ### 🏃‍♂️ Get started!
+                                                    
+        1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
+        2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
+        3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
+        4. **Start course generating**: <font color = 'grey'>Touch "Generate my course!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
+        5. **Interactive learning**: <font color = 'grey'>Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.</font>
+                                
+        🎉 Have fun playing with Omnitutor!                                                                                                              
+        """
+    write_description = st.empty()
+    write_description.markdown(description, unsafe_allow_html=True)
     
     user_question = st.chat_input("Enter your questions when learning...")
     
@@ -478,13 +518,13 @@ def app():
     if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
             time.sleep(0.1)
-            display_description(False)
+            write_description.empty()
             ss["OPENAI_API_KEY"] = api_key
             st.markdown("✅ API Key saved successfully.")
             time.sleep(2)
-            display_description(True)
+            write_description.markdown(description, unsafe_allow_html=True)
         else:
-            display_description(False)
+            write_description.empty()
             st.markdown("🤯 请输入正确的OpenAI API Key令牌 Please enter the correct OpenAI API Key.")
     
     if added_files:
@@ -532,7 +572,7 @@ def app():
 
     if update_vdb:
         if not added_files:
-            display_description(False)
+            
             st.markdown("🤯 Please upload your file(s) first.")
         else:
             time.sleep(0.2)
@@ -541,7 +581,7 @@ def app():
 
     if btn_next:
         ss.start_learning = 1
-        display_description(False)
+        write_description.empty()
         if ss["OPENAI_API_KEY"] != '':
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             col1, col2 = st.columns([0.6,0.4])
@@ -550,52 +590,50 @@ def app():
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
-                    for lesson_description in ss.course_outline_list:
-                        if ss.lesson_counter < ss.num_lessons:
-                            ss.lesson_counter += 1
-                            new_lesson = visualize_new_content(
-                                client, 
-                                ss.lesson_counter, 
-                                lesson_description, 
-                                ss.embeddings_df, 
-                                ss.faiss_index, 
-                                ss.language, 
-                                ss.style_options, 
-                                ss["openai_model"]
-                            )
-                            ss.course_content_list.append(new_lesson)
-                        else:
-                            display_current_status_col1()
-                            break
+                    if ss.lesson_counter < ss.num_lessons:
+                        new_lesson = visualize_new_content(
+                            client, 
+                            ss.lesson_counter, 
+                            ss.course_outline_list[ss.lesson_counter], 
+                            ss.embeddings_df, 
+                            ss.faiss_index, 
+                            ss.language, 
+                            ss.style_options, 
+                            ss["openai_model"]
+                        )
+                        ss.course_content_list.append(new_lesson)
+                        ss.lesson_counter += 1
+                    else:
+                        display_current_status_col1()
+                        
                 else:
                     regenerate_outline(ss.course_outline_list)
                     regenerate_content(ss.course_content_list)
-                    for lesson_description in ss.course_outline_list:
-                        if ss.lesson_counter < ss.num_lessons:
-                            ss.lesson_counter += 1
-                            new_lesson = visualize_new_content(
-                                client, 
-                                ss.lesson_counter, 
-                                lesson_description, 
-                                ss.embeddings_df, 
-                                ss.faiss_index, 
-                                ss.language, 
-                                ss.style_options, 
-                                ss["openai_model"]
-                            )
-                            ss.course_content_list.append(new_lesson)
-                        else:
-                            display_current_status_col1()
-                            break
+                    if ss.lesson_counter < ss.num_lessons:
+                        new_lesson = visualize_new_content(
+                            client, 
+                            ss.lesson_counter, 
+                            ss.course_outline_list[ss.lesson_counter], 
+                            ss.embeddings_df, 
+                            ss.faiss_index, 
+                            ss.language, 
+                            ss.style_options, 
+                            ss["openai_model"]
+                        )
+                        ss.course_content_list.append(new_lesson)
+                        ss.lesson_counter += 1
+                    else:
+                        display_current_status_col1()
+                    
             with col2:
                 display_current_status_col2()
         else:
-            display_description(False)
+            write_description.empty()
             st.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
 
     if user_question:
         ss.start_learning = 1
-        display_description(False)
+        write_description.empty()
         if ss["OPENAI_API_KEY"] != '':
             if ss.embeddings_df == '' or ss.faiss_index == '':
                 warning_upload_materials = st.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
