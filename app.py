@@ -577,12 +577,12 @@ def app():
     
     if btn_next:
         write_description.empty()
-        if  len(ss["OPENAI_API_KEY"]) != 51:
+        if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
             display_current_status(
                 write_description, 
                 description, 
-                success_file, 
+                success_file,
                 success_vdb
             )
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
@@ -621,10 +621,10 @@ def app():
                         regenerate_content(ss.course_content_list)
                         ss.lesson_counter += 1
                         new_lesson = visualize_new_content(
-                            client, 
-                            ss.lesson_counter, 
-                            ss.course_outline_list[ss.lesson_counter], 
-                            ss.embeddings_df, 
+                            client,
+                            ss.lesson_counter,
+                            ss.course_outline_list[ss.lesson_counter-1],
+                            ss.embeddings_df,
                             ss.faiss_index, 
                             ss.language, 
                             ss.style_options, 
