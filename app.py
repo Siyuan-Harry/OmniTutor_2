@@ -502,8 +502,10 @@ def app():
             time.sleep(0.1)
             write_description.empty()
             ss["OPENAI_API_KEY"] = api_key
-            st.markdown("✅ API Key saved successfully.")
+            save_key_success = st.empty()
+            save_key_success.success("✅ API Key saved successfully.")
             time.sleep(2)
+            save_key_success.empty()
             write_description.markdown(description, unsafe_allow_html=True)
         else:
             write_description.empty()
