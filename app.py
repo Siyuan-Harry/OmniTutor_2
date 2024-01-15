@@ -419,14 +419,14 @@ def display_warning_upload_materials_vdb():
     time.sleep(2)
     warning_upload_materials_vdb.empty()
 
-def initialize_empty_placeholder():
+def initialize_empty_placeholders():
     success_file = st.empty()
     success_vdb = st.empty()
     return success_file, success_vdb
 
 def app():
     initialize_session_state()
-    success_file, success_vdb = initialize_empty_placeholder()
+    success_file, success_vdb = initialize_empty_placeholders()
     
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
