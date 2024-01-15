@@ -364,12 +364,12 @@ def initialize_session_state():
 
 def display_current_status_col1(write_description, description):
     if ss.course_outline_list == []:
-            if ss.embeddings_df != '' or ss.faiss_index != '':
-                write_description.markdown(description, unsafe_allow_html=True)
-                st.success('Processing file...Done')
-                st.success("Constructing vector database from provided materials...Done")
-            else:
-                write_description.markdown(description, unsafe_allow_html=True)
+        if ss.embeddings_df != '' or ss.faiss_index != '':
+            write_description.markdown(description, unsafe_allow_html=True)
+            st.success('Processing file...Done')
+            st.success("Constructing vector database from provided materials...Done")
+        else:
+            write_description.markdown(description, unsafe_allow_html=True)
     elif ss.course_outline_list != [] and ss.course_content_list == []:
         regenerate_outline(ss.course_outline_list)
     else:
@@ -603,25 +603,22 @@ def app():
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     #cleaner
                     regenerate_outline(ss.course_outline_list)
-                    if ss.lesson_counter < ss.num_lessons:
-                        ss.lesson_counter += 1
-                        new_lesson = visualize_new_content(
-                            client, 
-                            ss.lesson_counter, 
-                            ss.course_outline_list[ss.lesson_counter], 
-                            ss.embeddings_df, 
-                            ss.faiss_index, 
-                            ss.language, 
-                            ss.style_options, 
-                            ss["openai_model"]
-                        )
-                        ss.course_content_list.append(new_lesson)
-                    else:
-                        display_current_status_col1(write_description, description)
+                    ss.lesson_counter += 1
+                    new_lesson = visualize_new_content(
+                        client, 
+                        ss.lesson_counter, 
+                        ss.course_outline_list[ss.lesson_counter], 
+                        ss.embeddings_df, 
+                        ss.faiss_index, 
+                        ss.language, 
+                        ss.style_options, 
+                        ss["openai_model"]
+                    )
+                    ss.course_content_list.append(new_lesson)
                 else:
-                    regenerate_outline(ss.course_outline_list)
-                    regenerate_content(ss.course_content_list)
                     if ss.lesson_counter < ss.num_lessons:
+                        regenerate_outline(ss.course_outline_list)
+                        regenerate_content(ss.course_content_list)
                         ss.lesson_counter += 1
                         new_lesson = visualize_new_content(
                             client, 
