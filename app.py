@@ -230,7 +230,7 @@ def decorate_user_question(user_question, retrieved_chunks_for_user):
     '''
     return decorated_prompt
 
-def initialize_file(added_files):
+def initialize_file(added_files, success_file):
     temp_file_paths = []
     with st.spinner('Processing file(s)...'):
         for added_file in added_files:
@@ -245,16 +245,14 @@ def initialize_file(added_files):
                     tmp_path = tmp.name
             temp_file_paths.append(tmp_path)
     #success_outline = 
-    success_file = st.empty()
     success_file.success('Processing file(s)...Done')
     #time.sleep(0.5)
     #success_outline.empty()
     return temp_file_paths, success_file
 
-def initialize_vdb(temp_file_paths):
+def initialize_vdb(temp_file_paths, success_vdb):
     with st.spinner('Constructing vector database from provided materials...'):
         embeddings_df, faiss_index = constructVDB(temp_file_paths)
-    success_vdb = st.empty()
     success_vdb.success("Constructing vector database from provided materials...Done")
     return embeddings_df, faiss_index, success_vdb
 
@@ -421,8 +419,14 @@ def display_warning_upload_materials_vdb():
     time.sleep(2)
     warning_upload_materials_vdb.empty()
 
+def initialize_empty_placeholder():
+    success_file = st.empty()
+    success_vdb = st.empty()
+    return success_file, success_vdb
+
 def app():
     initialize_session_state()
+    success_file, success_vdb = initialize_empty_placeholder()
     
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
@@ -568,8 +572,8 @@ def app():
                 success_file, 
                 success_vdb
             )
-            ss.temp_file_paths, success_file = initialize_file(added_files)
-            ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths)
+            ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
+            ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
 
     if btn_next:
