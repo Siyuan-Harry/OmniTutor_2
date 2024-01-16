@@ -497,16 +497,6 @@ def app():
     
     user_question = st.chat_input("Enter your questions when learning...")
     
-    """
-    if use_35:
-        ss["openai_model"] = 'gpt-3.5-turbo-1106'
-        display_current_status(
-            write_description, 
-            description, 
-            success_file, 
-            success_vdb
-        )
-    """
 
     if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
@@ -523,53 +513,6 @@ def app():
             display_warning_api_key()
             write_description.markdown(description, unsafe_allow_html=True)
     
-    #这个有问题
-    """
-    elif added_files:
-        display_current_status(
-            write_description, 
-            description, 
-            success_file, 
-            success_vdb
-        )
-    """
-            
-    #这个有问题
-    '''
-    elif num_lessons:
-        ss.num_lessons = num_lessons
-        display_current_status(
-            write_description, 
-            description, 
-            success_file, 
-            success_vdb
-        )
-    '''
-    
-    #这个有问题
-    """
-    elif custom_options:
-        ss.style_options = add_prompt_course_style(custom_options)
-        display_current_status(
-            write_description, 
-            description, 
-            success_file, 
-            success_vdb
-        )
-    """
-    
-    #这个有问题
-    """
-    elif Chinese:
-        ss.language = 'Chinese'
-        display_current_status(
-            write_description, 
-            description, 
-            success_file, 
-            success_vdb
-        )
-    """
-
     if update_vdb:
         if not added_files:
             if ss.start_learning == 0:
