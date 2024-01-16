@@ -292,11 +292,11 @@ def regenerate_outline(course_outline_list):
             lessons_count += 1
             course_outline_string += f"**{lessons_count}. {outline[0]}**"
             course_outline_string += f"\n\n{outline[1]} \n\n"
-        write_course_outline = st.expander("Check the course outline", expanded=False)
-        with write_course_outline:
+        #write_course_outline = st.empty()
+        with st.expander("Check the course outline", expanded=False):
             st.markdown(course_outline_string)
     except Exception:
-        st.markdown('🤯Oops.. We encountered an error. Please try again.')
+        display_general_warning()
         pass
 
 def regenerate_content(course_content_list):
@@ -307,7 +307,7 @@ def regenerate_content(course_content_list):
             with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
                 st.markdown(content)
     except Exception:
-        st.markdown('🤯Oops.. We encountered an error. Please try again.')
+        display_general_warning()
         pass
 
 def add_prompt_course_style(selected_style_list):
@@ -387,7 +387,7 @@ def display_current_status_col2():
     else:
         pass
 
-def display_current_status(write_description, description, success_file, success_vdb):
+def display_current_status(write_description, description, success_file, success_vdb, col1_container, col2_container):
     if ss.start_learning == 0 and ss.faiss_index != '':
         success_file.success('Processing file(s)...Done')
         success_vdb.success("Constructing vector database from provided materials...Done")
@@ -397,15 +397,26 @@ def display_current_status(write_description, description, success_file, success
         write_description.empty()
         col1, col2 = st.columns([0.6,0.4])
         with col1:
-            display_current_status_col1(write_description, description)
+            col1_container.empty()
+            with col1_container.container():
+                display_current_status_col1(write_description, description)
         with col2:
-            display_current_status_col2()
+            col1_container.empty()
+            with col2_container.container():
+                display_current_status_col2()
+    return
 
 def display_warning_api_key():
     warning_api_key = st.empty()
     warning_api_key.markdown("🤯 请先输入正确的OpenAI API Key令牌 Please enter the OpenAI API Key first.")
     time.sleep(2)
     warning_api_key.empty()
+
+def display_general_warning():
+    general_warning = st.empty()
+    general_warning.markdown('🤯Oops.. We encountered an error. Please try again.')
+    time.sleep(2)
+    general_warning.empty()
 
 def display_warning_upload_materials():
     warning_upload_materials = st.empty()
@@ -422,7 +433,13 @@ def display_warning_upload_materials_vdb():
 def initialize_empty_placeholders():
     success_file = st.empty()
     success_vdb = st.empty()
-    return success_file, success_vdb
+    col1_container = st.empty()
+    col2_container = st.empty()
+    return success_file, success_vdb, col1_container, col2_container
+
+def clean_columns(col1_container, col2_container):
+    col1_container.empty()
+    col2_container.empty()
 
 def app():
     initialize_session_state()
@@ -487,7 +504,7 @@ def app():
         """
     write_description = st.empty()
     write_description.markdown(description, unsafe_allow_html=True)
-    success_file, success_vdb = initialize_empty_placeholders()
+    success_file, success_vdb, col1_container, col2_container = initialize_empty_placeholders()
     
     user_question = st.chat_input("Enter your questions when learning...")
     
@@ -497,7 +514,9 @@ def app():
             write_description, 
             description, 
             success_file, 
-            success_vdb
+            success_vdb,
+            col1_container,
+            col2_container
         )
     
     if save_key:
@@ -520,7 +539,9 @@ def app():
             write_description, 
             description, 
             success_file, 
-            success_vdb
+            success_vdb,
+            col1_container,
+            col2_container
         )
 
     if num_lessons:
@@ -529,7 +550,9 @@ def app():
             write_description, 
             description, 
             success_file, 
-            success_vdb
+            success_vdb,
+            col1_container,
+            col2_container
         )
         
     if custom_options:
@@ -538,7 +561,9 @@ def app():
             write_description, 
             description, 
             success_file, 
-            success_vdb
+            success_vdb,
+            col1_container,
+            col2_container
         )
     
     if Chinese:
@@ -547,7 +572,9 @@ def app():
             write_description, 
             description, 
             success_file, 
-            success_vdb
+            success_vdb,
+            col1_container,
+            col2_container
         )
 
     if update_vdb:
@@ -562,7 +589,9 @@ def app():
                     write_description, 
                     description, 
                     success_file, 
-                    success_vdb
+                    success_vdb,
+                    col1_container,
+                    col2_container
                 )
         else:
             time.sleep(0.2)
@@ -570,7 +599,9 @@ def app():
                 write_description, 
                 description, 
                 success_file, 
-                success_vdb
+                success_vdb,
+                col1_container,
+                col2_container
             )
             ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
             ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
@@ -583,7 +614,9 @@ def app():
                 write_description, 
                 description, 
                 success_file,
-                success_vdb
+                success_vdb,
+                col1_container,
+                col2_container
             )
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
@@ -591,7 +624,9 @@ def app():
                 write_description, 
                 description, 
                 success_file, 
-                success_vdb
+                success_vdb,
+                col1_container,
+                col2_container
             )
         else:
             ss.start_learning = 1
@@ -599,42 +634,57 @@ def app():
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 if ss.course_outline_list == []:
-                    ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
+                    col1_container.empty()
+                    with col1_container.container():
+                        ss.course_outline_list = initialize_outline(
+                            client, 
+                            ss.temp_file_paths, 
+                            num_lessons, 
+                            ss.language, 
+                            ss["openai_model"], 
+                        )
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
-                    #cleaner
-                    #regenerate_outline(ss.course_outline_list)
-                    ss.lesson_counter += 1
-                    new_lesson = visualize_new_content(
-                        client, 
-                        ss.lesson_counter, 
-                        ss.course_outline_list[ss.lesson_counter], 
-                        ss.embeddings_df, 
-                        ss.faiss_index, 
-                        ss.language, 
-                        ss.style_options, 
-                        ss["openai_model"]
-                    )
-                    ss.course_content_list.append(new_lesson)
-                else:
-                    if ss.lesson_counter < ss.num_lessons:
-                        #regenerate_outline(ss.course_outline_list)
-                        #regenerate_content(ss.course_content_list)
-                        ss.lesson_counter += 1
+                    col1_container.empty()
+                    with col1_container.container():
+                        regenerate_outline(ss.course_outline_list)
+                        ss.lesson_counter = 1
                         new_lesson = visualize_new_content(
-                            client,
-                            ss.lesson_counter,
-                            ss.course_outline_list[ss.lesson_counter-1],
-                            ss.embeddings_df,
+                            client, 
+                            ss.lesson_counter, 
+                            ss.course_outline_list[ss.lesson_counter], 
+                            ss.embeddings_df, 
                             ss.faiss_index, 
                             ss.language, 
                             ss.style_options, 
                             ss["openai_model"]
                         )
-                        ss.course_content_list.append(new_lesson)
+                    ss.course_content_list.append(new_lesson)
+                else:
+                    if ss.lesson_counter < ss.num_lessons:
+                        col1_container.empty()
+                        with col1_container.container():
+                            regenerate_outline(ss.course_outline_list)
+                            regenerate_content(ss.course_content_list)
+                            ss.lesson_counter += 1
+                            new_lesson = visualize_new_content(
+                                client,
+                                ss.lesson_counter,
+                                ss.course_outline_list[ss.lesson_counter-1],
+                                ss.embeddings_df,
+                                ss.faiss_index, 
+                                ss.language, 
+                                ss.style_options, 
+                                ss["openai_model"]
+                            )
+                            ss.course_content_list.append(new_lesson)
                     else:
-                        display_current_status_col1(write_description, description)
+                        col1_container.empty()
+                        with col1_container.container():
+                            display_current_status_col1(write_description, description)
             with col2:
-                display_current_status_col2()
+                col2_container.empty()
+                with col1_container.container():
+                    display_current_status_col2()
 
     if user_question:
         write_description.empty()
@@ -644,7 +694,9 @@ def app():
                 write_description, 
                 description, 
                 success_file, 
-                success_vdb
+                success_vdb,
+                col1_container,
+                col2_container
             )
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
@@ -652,7 +704,9 @@ def app():
                 write_description, 
                 description, 
                 success_file, 
-                success_vdb
+                success_vdb,
+                col1_container,
+                col2_container
             )
         else:
             ss.start_learning = 1
