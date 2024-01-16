@@ -552,7 +552,6 @@ def app():
                 success_vdb
             )
         else:
-            """initialize course generate configs"""
             ss.start_learning = 1
             ss.num_lessons = num_lessons
             ss.style_options = add_prompt_course_style(custom_options)
@@ -561,8 +560,6 @@ def app():
                 ss.language = "Chinese"
             if use_35:
                 ss["openai_model"] = 'gpt-3.5-turbo-1106'
-
-            """start to create one lesson"""
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 if ss.course_outline_list == []:
@@ -620,13 +617,11 @@ def app():
                 success_vdb
             )
         else:
-            """configs to start chating"""
             ss.start_learning = 1
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             if use_35:
                 ss["openai_model"] = 'gpt-3.5-turbo-1106'
 
-            """display messages"""
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 display_current_status_col1(homePage_container, description)
