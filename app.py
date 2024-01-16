@@ -296,7 +296,7 @@ def regenerate_outline(course_outline_list):
         with write_course_outline:
             st.markdown(course_outline_string)
     except Exception:
-        st.markdown('🤯Oops.. We encountered an error. Please try again.')
+        display_general_warning()
         pass
 
 def regenerate_content(course_content_list):
@@ -307,7 +307,7 @@ def regenerate_content(course_content_list):
             with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
                 st.markdown(content)
     except Exception:
-        st.markdown('🤯Oops.. We encountered an error. Please try again.')
+        display_general_warning()
         pass
 
 def add_prompt_course_style(selected_style_list):
@@ -418,6 +418,12 @@ def display_warning_upload_materials_vdb():
     warning_upload_materials_vdb.markdown('🤯 Please upload your learning material(s) and wait for constructing vector database first.')
     time.sleep(2)
     warning_upload_materials_vdb.empty()
+
+def display_general_warning():
+    general_warning = st.empty()
+    general_warning.markdown('🤯Oops.. We encountered an error. Please try again.')
+    time.sleep(2)
+    general_warning.empty()
 
 def initialize_empty_placeholders():
     success_file = st.empty()
@@ -603,11 +609,11 @@ def app():
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     #cleaner
                     #regenerate_outline(ss.course_outline_list)
-                    ss.lesson_counter += 1
+                    ss.lesson_counter = 1
                     new_lesson = visualize_new_content(
                         client, 
                         ss.lesson_counter, 
-                        ss.course_outline_list[ss.lesson_counter], 
+                        ss.course_outline_list[ss.lesson_counter-1], 
                         ss.embeddings_df, 
                         ss.faiss_index, 
                         ss.language, 
