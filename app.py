@@ -497,6 +497,7 @@ def app():
     
     user_question = st.chat_input("Enter your questions when learning...")
     
+    """
     if use_35:
         ss["openai_model"] = 'gpt-3.5-turbo-1106'
         display_current_status(
@@ -505,8 +506,9 @@ def app():
             success_file, 
             success_vdb
         )
-    
-    elif save_key:
+    """
+
+    if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
             time.sleep(0.1)
             write_description.empty()
@@ -521,6 +523,8 @@ def app():
             display_warning_api_key()
             write_description.markdown(description, unsafe_allow_html=True)
     
+    #这个有问题
+    """
     elif added_files:
         display_current_status(
             write_description, 
@@ -528,7 +532,10 @@ def app():
             success_file, 
             success_vdb
         )
-
+    """
+            
+    #这个有问题
+    '''
     elif num_lessons:
         ss.num_lessons = num_lessons
         display_current_status(
@@ -537,7 +544,10 @@ def app():
             success_file, 
             success_vdb
         )
-        
+    '''
+    
+    #这个有问题
+    """
     elif custom_options:
         ss.style_options = add_prompt_course_style(custom_options)
         display_current_status(
@@ -546,7 +556,10 @@ def app():
             success_file, 
             success_vdb
         )
+    """
     
+    #这个有问题
+    """
     elif Chinese:
         ss.language = 'Chinese'
         display_current_status(
@@ -555,8 +568,9 @@ def app():
             success_file, 
             success_vdb
         )
+    """
 
-    elif update_vdb:
+    if update_vdb:
         if not added_files:
             if ss.start_learning == 0:
                 write_description.empty()
@@ -581,7 +595,7 @@ def app():
             ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
             ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
-    elif btn_next:
+    if btn_next:
         write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
@@ -600,8 +614,17 @@ def app():
                 success_vdb
             )
         else:
+            """initialize course generate configs"""
             ss.start_learning = 1
+            ss.num_lessons = num_lessons
+            ss.style_options = add_prompt_course_style(custom_options)
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+            if Chinese:
+                ss.language = "Chinese"
+            if use_35:
+                ss["openai_model"] = 'gpt-3.5-turbo-1106'
+
+            """start to create one lesson"""
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 if ss.course_outline_list == []:
@@ -642,7 +665,7 @@ def app():
             with col2:
                 display_current_status_col2()
 
-    elif user_question:
+    if user_question:
         write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
@@ -661,12 +684,16 @@ def app():
                 success_vdb
             )
         else:
+            """configs to start chating"""
             ss.start_learning = 1
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+            if use_35:
+                ss["openai_model"] = 'gpt-3.5-turbo-1106'
+
+            """display messages"""
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 display_current_status_col1(write_description, description)
-                
             with col2:
                 st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
