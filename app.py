@@ -362,10 +362,14 @@ def initialize_session_state():
     if "is_displaying_description" not in ss:
         ss.is_displaying_description = 0
 
-def display_current_status_col1(homePage_container, description):
+def display_current_status_col1(write_description, description):
     if ss.course_outline_list == []:
-        with homePage_container.container():
-            st.markdown(description, unsafe_allow_html=True)
+        if ss.embeddings_df != '' or ss.faiss_index != '':
+            write_description.markdown(description, unsafe_allow_html=True)
+            st.success('Processing file...Done')
+            st.success("Constructing vector database from provided materials...Done")
+        else:
+            write_description.markdown(description, unsafe_allow_html=True)
     elif ss.course_outline_list != [] and ss.course_content_list == []:
         regenerate_outline(ss.course_outline_list)
     else:
@@ -383,16 +387,17 @@ def display_current_status_col2():
     else:
         pass
 
-def display_current_status(homePage_container, description, success_file, success_vdb):
+def display_current_status(write_description, description, success_file, success_vdb):
     if ss.start_learning == 0 and ss.faiss_index != '':
-        with homePage_container.container():
-            success_file.success('Processing file(s)...Done')
-            success_vdb.success("Constructing vector database from provided materials...Done")
+        success_file.success('Processing file(s)...Done')
+        success_vdb.success("Constructing vector database from provided materials...Done")
     elif ss.start_learning == 1:
-        homePage_container.empty()
+        success_file.empty()
+        success_vdb.empty()
+        write_description.empty()
         col1, col2 = st.columns([0.6,0.4])
         with col1:
-            display_current_status_col1(homePage_container, description)
+            display_current_status_col1(write_description, description)
         with col2:
             display_current_status_col2()
 
@@ -485,9 +490,8 @@ def app():
                                     
             ###### 🎉 Have fun playing with Omnitutor!                                                                                                              
             """
-    homePage_container = st.empty()
-    with homePage_container.container():
-        st.markdown(description, unsafe_allow_html=True)
+    write_description = st.empty()
+    write_description.markdown(description, unsafe_allow_html=True)
     
     success_file, success_vdb = initialize_empty_placeholders()
     
@@ -496,48 +500,43 @@ def app():
     if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
             time.sleep(0.1)
-            homePage_container.empty()
+            write_description.empty()
             ss["OPENAI_API_KEY"] = api_key
             save_key_success = st.empty()
             save_key_success.success("✅ API Key saved successfully.")
             time.sleep(2)
             save_key_success.empty()
-            homePage_container.markdown(description, unsafe_allow_html=True)
+            write_description.markdown(description, unsafe_allow_html=True)
         else:
-            homePage_container.empty()
+            write_description.empty()
             display_warning_api_key()
-            homePage_container.markdown(description, unsafe_allow_html=True)
+            write_description.markdown(description, unsafe_allow_html=True)
     
     if update_vdb:
         if not added_files:
             if ss.start_learning == 0:
-                homePage_container.empty()
+                write_description.empty()
                 display_warning_upload_materials()
-                homePage_container.markdown(description, unsafe_allow_html=True)
+                write_description.markdown(description, unsafe_allow_html=True)
             elif ss.start_learning == 1:
                 display_warning_upload_materials()
                 display_current_status(
-                    homePage_container, 
+                    write_description, 
                     description, 
                     success_file, 
                     success_vdb
                 )
         else:
             time.sleep(0.2)
-            if ss.start_learning == 0:
-                with homePage_container.container():
-                    ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
-                    ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
-            elif ss.start_learning == 1:
-                ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
-                ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
+            ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
+            ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
     if btn_next:
-        homePage_container.empty()
+        write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
             display_current_status(
-                homePage_container, 
+                write_description, 
                 description, 
                 success_file,
                 success_vdb
@@ -545,7 +544,7 @@ def app():
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
             display_current_status(
-                homePage_container, 
+                write_description, 
                 description, 
                 success_file, 
                 success_vdb
@@ -594,16 +593,16 @@ def app():
                         )
                         ss.course_content_list.append(new_lesson)
                     else:
-                        display_current_status_col1(homePage_container, description)
+                        display_current_status_col1(write_description, description)
             with col2:
                 display_current_status_col2()
 
     if user_question:
-        homePage_container.empty()
+        write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
             display_current_status(
-                homePage_container, 
+                write_description, 
                 description, 
                 success_file, 
                 success_vdb
@@ -611,7 +610,8 @@ def app():
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
             display_current_status(
-                homePage_container, 
+                write_description, 
+                description, 
                 success_file, 
                 success_vdb
             )
@@ -623,7 +623,7 @@ def app():
 
             col1, col2 = st.columns([0.6,0.4])
             with col1:
-                display_current_status_col1(homePage_container, description)
+                display_current_status_col1(write_description, description)
             with col2:
                 st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
