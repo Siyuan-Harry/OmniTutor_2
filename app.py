@@ -506,7 +506,7 @@ def app():
             success_vdb
         )
     
-    if save_key:
+    elif save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
             time.sleep(0.1)
             write_description.empty()
@@ -521,7 +521,7 @@ def app():
             display_warning_api_key()
             write_description.markdown(description, unsafe_allow_html=True)
     
-    if added_files:
+    elif added_files:
         display_current_status(
             write_description, 
             description, 
@@ -529,7 +529,7 @@ def app():
             success_vdb
         )
 
-    if num_lessons:
+    elif num_lessons:
         ss.num_lessons = num_lessons
         display_current_status(
             write_description, 
@@ -538,7 +538,7 @@ def app():
             success_vdb
         )
         
-    if custom_options:
+    elif custom_options:
         ss.style_options = add_prompt_course_style(custom_options)
         display_current_status(
             write_description, 
@@ -547,7 +547,7 @@ def app():
             success_vdb
         )
     
-    if Chinese:
+    elif Chinese:
         ss.language = 'Chinese'
         display_current_status(
             write_description, 
@@ -556,7 +556,7 @@ def app():
             success_vdb
         )
 
-    if update_vdb:
+    elif update_vdb:
         if not added_files:
             if ss.start_learning == 0:
                 write_description.empty()
@@ -581,7 +581,7 @@ def app():
             ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
             ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
-    if btn_next:
+    elif btn_next:
         write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
@@ -642,7 +642,7 @@ def app():
             with col2:
                 display_current_status_col2()
 
-    if user_question:
+    elif user_question:
         write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
