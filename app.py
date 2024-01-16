@@ -630,8 +630,7 @@ def app():
                 if ss.course_outline_list == []:
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
-                    #cleaner
-                    #regenerate_outline(ss.course_outline_list)
+                    regenerate_outline(ss.course_outline_list)
                     ss.lesson_counter = 1
                     new_lesson = visualize_new_content(
                         client, 
@@ -646,8 +645,8 @@ def app():
                     ss.course_content_list.append(new_lesson)
                 else:
                     if ss.lesson_counter < ss.num_lessons:
-                        #regenerate_outline(ss.course_outline_list)
-                        #regenerate_content(ss.course_content_list)
+                        regenerate_outline(ss.course_outline_list)
+                        regenerate_content(ss.course_content_list)
                         ss.lesson_counter += 1
                         new_lesson = visualize_new_content(
                             client,
