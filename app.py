@@ -423,8 +423,7 @@ def display_general_warning():
 def initialize_empty_placeholders():
     success_file = st.empty()
     success_vdb = st.empty()
-    homePage_container = st.empty()
-    return success_file, success_vdb, homePage_container
+    return success_file, success_vdb
 
 def app():
     initialize_session_state()
