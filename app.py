@@ -471,7 +471,7 @@ def app():
     description = """
             <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
             
-            Github Repo: https://github.com/Siyuan-Harry/OmniTutor 
+            Github Repo (for OmniTutor 1.0): https://github.com/Siyuan-Harry/OmniTutor 
 
             ### ✨ Key features                                           
                                                     
@@ -485,8 +485,9 @@ def app():
             1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
             2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
             3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
-            4. **Start course generating**: <font color = 'grey'>Touch "Generate my course!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
-            5. **Interactive learning**: <font color = 'grey'>Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.</font>
+            4. **Start course generating**: <font color = 'grey'>Touch "Next Leaning Step!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
+            5. **Interactive course generation**: <font color = 'grey'>Whenever you finish one leaning step, ouch "Next Leaning Step!" button to continue. You will never be left behind.</font>
+            6. **Interactive learning**: <font color = 'grey'>Ask OmniTutor any questions related to this course whenever you encountered them.</font>
                                     
             ###### 🎉 Have fun playing with Omnitutor!                                                                                                              
             """
