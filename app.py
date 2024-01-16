@@ -362,14 +362,10 @@ def initialize_session_state():
     if "is_displaying_description" not in ss:
         ss.is_displaying_description = 0
 
-def display_current_status_col1(write_description, description):
+def display_current_status_col1(homePage_container, description):
     if ss.course_outline_list == []:
-        if ss.embeddings_df != '' or ss.faiss_index != '':
-            write_description.markdown(description, unsafe_allow_html=True)
-            st.success('Processing file...Done')
-            st.success("Constructing vector database from provided materials...Done")
-        else:
-            write_description.markdown(description, unsafe_allow_html=True)
+        with homePage_container.container():
+            st.markdown(description, unsafe_allow_html=True)
     elif ss.course_outline_list != [] and ss.course_content_list == []:
         regenerate_outline(ss.course_outline_list)
     else:
@@ -387,17 +383,16 @@ def display_current_status_col2():
     else:
         pass
 
-def display_current_status(write_description, description, success_file, success_vdb):
+def display_current_status(homePage_container, description, success_file, success_vdb):
     if ss.start_learning == 0 and ss.faiss_index != '':
-        success_file.success('Processing file(s)...Done')
-        success_vdb.success("Constructing vector database from provided materials...Done")
+        with homePage_container.container():
+            success_file.success('Processing file(s)...Done')
+            success_vdb.success("Constructing vector database from provided materials...Done")
     elif ss.start_learning == 1:
-        success_file.empty()
-        success_vdb.empty()
-        write_description.empty()
+        homePage_container.empty()
         col1, col2 = st.columns([0.6,0.4])
         with col1:
-            display_current_status_col1(write_description, description)
+            display_current_status_col1(homePage_container, description)
         with col2:
             display_current_status_col2()
 
@@ -428,7 +423,8 @@ def display_general_warning():
 def initialize_empty_placeholders():
     success_file = st.empty()
     success_vdb = st.empty()
-    return success_file, success_vdb
+    homePage_container = st.empty()
+    return success_file, success_vdb, homePage_container
 
 def app():
     initialize_session_state()
@@ -468,82 +464,81 @@ def app():
         </style>
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
-    
     description = """
-        <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
-        
-        Github Repo: https://github.com/Siyuan-Harry/OmniTutor 
+            <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
+            
+            Github Repo: https://github.com/Siyuan-Harry/OmniTutor 
 
-        ### ✨ Key features                                           
-                                                   
-        - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
-        - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
-        - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
-        - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
-        
-        ### 🏃‍♂️ Get started!
+            ### ✨ Key features                                           
                                                     
-        1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
-        2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
-        3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
-        4. **Start course generating**: <font color = 'grey'>Touch "Generate my course!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
-        5. **Interactive learning**: <font color = 'grey'>Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.</font>
-                                
-        🎉 Have fun playing with Omnitutor!                                                                                                              
-        """
-    write_description = st.empty()
-    write_description.markdown(description, unsafe_allow_html=True)
+            - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
+            - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
+            - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
+            - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
+            
+            ### 🏃‍♂️ Get started!
+                                                        
+            1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
+            2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
+            3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
+            4. **Start course generating**: <font color = 'grey'>Touch "Generate my course!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
+            5. **Interactive learning**: <font color = 'grey'>Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.</font>
+                                    
+            ###### 🎉 Have fun playing with Omnitutor!                                                                                                              
+            """
+    homePage_container = st.empty()
+    with homePage_container.container():
+        st.markdown(description, unsafe_allow_html=True)
+    
     success_file, success_vdb = initialize_empty_placeholders()
     
     user_question = st.chat_input("Enter your questions when learning...")
     
-
     if save_key:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51:
             time.sleep(0.1)
-            write_description.empty()
+            homePage_container.empty()
             ss["OPENAI_API_KEY"] = api_key
             save_key_success = st.empty()
             save_key_success.success("✅ API Key saved successfully.")
             time.sleep(2)
             save_key_success.empty()
-            write_description.markdown(description, unsafe_allow_html=True)
+            homePage_container.markdown(description, unsafe_allow_html=True)
         else:
-            write_description.empty()
+            homePage_container.empty()
             display_warning_api_key()
-            write_description.markdown(description, unsafe_allow_html=True)
+            homePage_container.markdown(description, unsafe_allow_html=True)
     
     if update_vdb:
         if not added_files:
             if ss.start_learning == 0:
-                write_description.empty()
+                homePage_container.empty()
                 display_warning_upload_materials()
-                write_description.markdown(description, unsafe_allow_html=True)
+                homePage_container.markdown(description, unsafe_allow_html=True)
             elif ss.start_learning == 1:
                 display_warning_upload_materials()
                 display_current_status(
-                    write_description, 
+                    homePage_container, 
                     description, 
                     success_file, 
                     success_vdb
                 )
         else:
             time.sleep(0.2)
-            display_current_status(
-                write_description, 
-                description, 
-                success_file, 
-                success_vdb
-            )
-            ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
-            ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
+            if ss.start_learning == 0:
+                with homePage_container.container:
+                    ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
+                    ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
+            elif ss.start_learning == 1:
+                ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
+                ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
     if btn_next:
-        write_description.empty()
+        homePage_container.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
             display_current_status(
-                write_description, 
+                homePage_container, 
                 description, 
                 success_file,
                 success_vdb
@@ -551,7 +546,7 @@ def app():
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
             display_current_status(
-                write_description, 
+                homePage_container, 
                 description, 
                 success_file, 
                 success_vdb
@@ -603,16 +598,16 @@ def app():
                         )
                         ss.course_content_list.append(new_lesson)
                     else:
-                        display_current_status_col1(write_description, description)
+                        display_current_status_col1(homePage_container, description)
             with col2:
                 display_current_status_col2()
 
     if user_question:
-        write_description.empty()
+        homePage_container.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
             display_current_status(
-                write_description, 
+                homePage_container, 
                 description, 
                 success_file, 
                 success_vdb
@@ -620,8 +615,7 @@ def app():
         elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
             display_warning_upload_materials_vdb()
             display_current_status(
-                write_description, 
-                description, 
+                homePage_container, 
                 success_file, 
                 success_vdb
             )
@@ -635,7 +629,7 @@ def app():
             """display messages"""
             col1, col2 = st.columns([0.6,0.4])
             with col1:
-                display_current_status_col1(write_description, description)
+                display_current_status_col1(homePage_container, description)
             with col2:
                 st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
