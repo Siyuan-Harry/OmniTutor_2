@@ -525,7 +525,7 @@ def app():
         else:
             time.sleep(0.2)
             if ss.start_learning == 0:
-                with homePage_container.container:
+                with homePage_container.container():
                     ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
                     ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
             elif ss.start_learning == 1:
