@@ -509,9 +509,6 @@ def app():
             if ss["OPENAI_API_KEY"] == '':
                 ss["OPENAI_API_KEY"] = api_key
                 st.success("✅ API Key stored successfully!")
-            if ss.embeddings_df == '':
-                ss.temp_file_paths = initialize_file(added_files)
-                ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
             if Chinese:
                 ss.language = "Chinese"
             if use_35:
@@ -521,6 +518,8 @@ def app():
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 if ss.course_outline_list == []:
+                    ss.temp_file_paths = initialize_file(added_files)
+                    ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
