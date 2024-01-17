@@ -488,22 +488,25 @@ def app():
     if btn_next:
         write_description.empty()
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
+            
             ss.start_learning = 1
             ss.num_lessons = num_lessons
             ss.style_options = add_prompt_course_style(custom_options)
             if ss["OPENAI_API_KEY"] == '':
                 ss["OPENAI_API_KEY"] = api_key
                 st.success("✅ API Key stored successfully!")
-            client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+            if ss.embeddings_df == '':
+                ss.temp_file_paths = initialize_file(added_files)
+                ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
             if Chinese:
                 ss.language = "Chinese"
             if use_35:
                 ss["openai_model"] = 'gpt-3.5-turbo-1106'
+            client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 if ss.course_outline_list == []:
-                    ss.temp_file_paths = initialize_file(added_files)
-                    ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
