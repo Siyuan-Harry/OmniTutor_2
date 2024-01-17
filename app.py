@@ -485,6 +485,8 @@ def app():
     
     user_question = st.chat_input("Enter your questions when learning...")
     
+    if api_key:
+        pass
 
     if btn_next:
         write_description.empty()
