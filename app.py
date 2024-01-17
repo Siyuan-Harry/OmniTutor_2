@@ -484,9 +484,6 @@ def app():
     write_description.markdown(description, unsafe_allow_html=True)
     
     user_question = st.chat_input("Enter your questions when learning...")
-    
-    if api_key:
-        pass
 
     if btn_next:
         write_description.empty()
@@ -494,7 +491,9 @@ def app():
             ss.start_learning = 1
             ss.num_lessons = num_lessons
             ss.style_options = add_prompt_course_style(custom_options)
-            ss["OPENAI_API_KEY"] = api_key
+            if ss["OPENAI_API_KEY"] == '':
+                ss["OPENAI_API_KEY"] = api_key
+                st.success("✅ API Key stored successfully!")
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             if Chinese:
                 ss.language = "Chinese"
