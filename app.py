@@ -428,7 +428,10 @@ def convert_markdown_string(course_outline_list, course_content_list):
         lessons_count += 1
         course_markdown_string += f"**{lessons_count}. {outline[0]}**"
         course_markdown_string += f"\n\n{outline[1]} \n\n"
+    lessons_count = 0
     for content in course_content_list:
+        lessons_count += 1
+        course_markdown_string += f"# Lesson {lessons_count}\n\n"
         course_markdown_string += f"{content}\n\n"
 
     return course_markdown_string
