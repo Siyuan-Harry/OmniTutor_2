@@ -553,7 +553,7 @@ def app():
                         )
                         ss.course_content_list.append(new_lesson)
                         course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
-                        st.download_button(
+                        download = st.download_button(
                             label="Download Course Script",
                             data=course_md,
                             file_name='OmniTutor_Your_Course.md',
@@ -572,6 +572,9 @@ def app():
             write_description.empty()
             display_warning_upload_materials()
             write_description.markdown(description, unsafe_allow_html=True)
+
+    if download:
+        display_current_status(write_description, description)
 
     if user_question:
         write_description.empty()
