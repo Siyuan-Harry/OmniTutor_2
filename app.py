@@ -388,7 +388,9 @@ def display_current_status_col2():
         pass
 
 def display_current_status(write_description, description, success_file, success_vdb):
-    if ss.start_learning == 0 and ss.faiss_index != '':
+    if ss.start_learning == 0 and ss.faiss_index == '':
+        write_description.markdown(description)
+    elif ss.start_learning == 0 and ss.faiss_index != '':
         success_file.success('Processing file(s)...Done')
         success_vdb.success("Constructing vector database from provided materials...Done")
     elif ss.start_learning == 1:
@@ -449,6 +451,7 @@ def app():
             )
             ss.language = 'English'
             Chinese = st.checkbox('Output in Chinese')
+            save_customized_options = st.button("Save my options")
         btn_next = st.button('Okay, next learning step! ⏩️')
     
     st.title("OmniTutor 2.0")
@@ -532,6 +535,15 @@ def app():
             ss.temp_file_paths, success_file = initialize_file(added_files, success_file)
             ss.embeddings_df, ss.faiss_index, success_vdb = initialize_vdb(ss.temp_file_paths, success_vdb)
     
+    if ss.start_learning == 1 and (custom_options or num_lessons or Chinese):
+        display_current_status(
+            write_description, 
+            description, 
+            success_file, 
+            success_vdb
+        )
+
+
     if btn_next:
         write_description.empty()
         if len(ss["OPENAI_API_KEY"]) != 51:
