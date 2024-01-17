@@ -558,6 +558,8 @@ def app():
                             data=course_md,
                             file_name='OmniTutor_Your_Course.md',
                         )
+                        if download:
+                            display_current_status(write_description, description)
                     else:
                         display_current_status_col1(write_description, description)
             with col2:
@@ -573,8 +575,7 @@ def app():
             display_warning_upload_materials()
             write_description.markdown(description, unsafe_allow_html=True)
 
-    if download:
-        display_current_status(write_description, description)
+    
 
     if user_question:
         write_description.empty()
