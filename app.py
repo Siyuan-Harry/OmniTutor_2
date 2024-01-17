@@ -421,6 +421,20 @@ def display_general_warning():
     time.sleep(2)
     general_warning.empty()
 
+def convert_markdown_file(course_outline_list, course_content_list):
+    course_markdown_string = ''
+    lessons_count = 0
+    for outline in course_outline_list:
+        lessons_count += 1
+        course_markdown_string += f"**{lessons_count}. {outline[0]}**"
+        course_markdown_string += f"\n\n{outline[1]} \n\n"
+    for content in course_content_list:
+        course_markdown_string += f"{content}\n\n"
+
+    with open("OmniTutor_Your_Course.md", "w") as file:
+        file.write(course_markdown_string)
+    return file
+
 def app():
     initialize_session_state()
     
@@ -538,6 +552,12 @@ def app():
                             ss["openai_model"]
                         )
                         ss.course_content_list.append(new_lesson)
+                        course_file = convert_markdown_file(ss.course_outline_list,ss.course_content_list)
+                        st.download_button(
+                            label="Download Course Script",
+                            data=course_file,
+                            file_name='OmniTutor_Your_Course.md',
+                        )
                     else:
                         display_current_status_col1(write_description, description)
             with col2:
@@ -605,6 +625,7 @@ def app():
                     )
                 ss.messages.append({"role": "assistant", "content": full_response})
                 ss.messages_ui.append({"role": "assistant", "content": full_response})
+
 
 
 if __name__ == "__main__":
