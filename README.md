@@ -11,7 +11,7 @@
 
 📢 **OmniTutor 2** is a fully updated version with greater robustness from the previous [OmniTutor prototype](https://github.com/Siyuan-Harry/OmniTutor/tree/main) version, and the reason for start this new git repo (rather than just create a new branch on old one) is, the old one is now used fully for teaching purpose. 
 
-OmniTutor is an all-round teacher, combined with a personalized teaching assistant that specially designed for all learners. Skilled in **creating customized courses** from given knowledge materials, and **answering course-related questions with trustable accuracy**. Hopefully it helps reducing obstacles in your learning journey.
+🧑‍🏫 OmniTutor is an all-round teacher, combined with a personalized teaching assistant that specially designed for all learners. Skilled in **creating customized courses** from given knowledge materials, and **answering course-related questions with trustable accuracy**. Hopefully it helps reducing obstacles in your learning journey.
 
 ## Features
 
