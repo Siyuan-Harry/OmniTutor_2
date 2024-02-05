@@ -1,11 +1,13 @@
-# OmniTutor_2
+# OmniTutor 2.0
+
+### Your personalized :blue[AI Knowledge Engine] 🦉
 
 ![](pic2.jpg)
 
 ## app links: 
 
-- Prototype version (OmniTutor): https://huggingface.co/spaces/Siyuan0730/OmniTutor
-- This brand-new version (OmniTutor 2.0): https://omnitutor2-qjmzigr9qpyekfufsd2wjv.streamlit.app/
+- **Prototype version (OmniTutor)**: https://huggingface.co/spaces/Siyuan0730/OmniTutor
+- **This brand-new version (OmniTutor 2.0)**: https://omnitutor2-qjmzigr9qpyekfufsd2wjv.streamlit.app/
 
 ## Introduction
 
