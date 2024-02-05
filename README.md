@@ -1,6 +1,6 @@
 # OmniTutor 2.0
 
-### Your personalized :blue[AI Knowledge Engine] 🦉
+## Your personalized <font color='blue'>AI Knowledge Engine</font> 🦉
 
 ![](pic2.jpg)
 
