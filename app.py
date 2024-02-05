@@ -475,7 +475,8 @@ def app():
     description = """
             <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
             
-            Github Repo (for OmniTutor 1.0): https://github.com/Siyuan-Harry/OmniTutor 
+            Github Repo: https://github.com/Siyuan-Harry/OmniTutor_2
+            - Github Repo (for OmniTutor prototype version): https://github.com/Siyuan-Harry/OmniTutor 
 
             ### ✨ Key features                                           
                                                     
