@@ -4,7 +4,6 @@ import faiss
 from openai import OpenAI
 import tempfile
 from PyPDF2 import PdfReader
-import io
 from sentence_transformers import SentenceTransformer
 import time
 import streamlit as st
