@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
-import faiss
+import chromadb
+from langchain.text_splitter import RecursiveCharacterTextSplitter, SentenceTransformersTokenTextSplitter
+from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from openai import OpenAI
 import tempfile
 from PyPDF2 import PdfReader
@@ -23,9 +25,6 @@ def download_nltk():
     nltk.download('punkt')
     nltk.download('wordnet')
     nltk.download('stopwords')
-
-def chunkstring(string, length):
-    return (string[0+i:length+i] for i in range(0, len(string), length))
 
 def pdf_parser(input_pdf):
     pdf = PdfReader(input_pdf)
@@ -129,58 +128,43 @@ def genarating_outline(client, keywords, num_lessons, language, model):
         pass
     return list_response
 
-def constructVDB(file_paths):
-    #把KM拆解为chunks
-    chunks = []
+def _chunk_texts(texts):
+    character_splitter = RecursiveCharacterTextSplitter(
+        separators=["\n\n", "\n", ". ", " ", ""],
+        chunk_size=1000,
+        chunk_overlap=0
+    )
+    character_split_texts = character_splitter.split_text('\n\n'.join(texts))
+
+    token_splitter = SentenceTransformersTokenTextSplitter(chunk_overlap=0, tokens_per_chunk=256)
+
+    token_split_texts = []
+    for text in character_split_texts:
+        token_split_texts += token_splitter.split_text(text)
+
+    return token_split_texts
+
+def constructVDB(file_paths, collection_name='user_upload', embedding_function=SentenceTransformerEmbeddingFunction):
+    texts = ""
     for filename in file_paths:
         with open(filename, 'r') as f:
             content = f.read()
-            for chunk in chunkstring(content, 730):
-                chunks.append(chunk)
-    chunk_df = pd.DataFrame(chunks, columns=['chunk'])
+            texts += content
+    chunks = _chunk_texts(texts)
 
-    #从文本chunks到embeddings
-    model = SentenceTransformer('paraphrase-mpnet-base-v2')
-    embeddings = model.encode(chunk_df['chunk'].tolist())
-    # convert embeddings to a dataframe
-    embedding_df = pd.DataFrame(embeddings.tolist())
-    # Concatenate the original dataframe with the embeddings
-    paraphrase_embeddings_df = pd.concat([chunk_df, embedding_df], axis=1)
-    # Save the results to a new csv file
+    chroma_client = chromadb.Client()
+    chroma_collection = chroma_client.create_collection(name=collection_name, embedding_function=embedding_function)
 
-    #从embeddings到向量数据库
-    # Load the embeddings
-    embeddings = paraphrase_embeddings_df.iloc[:, 1:].values  # All columns except the first (chunk text)
-    # Ensure that the array is C-contiguous
-    embeddings = np.ascontiguousarray(embeddings, dtype=np.float32)
-    # Preparation for Faiss
-    dimension = embeddings.shape[1]  # the dimension of the vector space
-    index = faiss.IndexFlatL2(dimension)
-    # Normalize the vectors
-    faiss.normalize_L2(embeddings)
-    # Build the index
-    index.add(embeddings)
-    # write index to disk
-    return paraphrase_embeddings_df, index
+    ids = [str(i) for i in range(len(chunks))]
 
-def searchVDB(search_sentence, paraphrase_embeddings_df, index):
-    #从向量数据库中检索相应文段
+    chroma_collection.add(ids=ids, documents=chunks)
+
+    return chroma_collection
+
+def searchVDB(query, chroma_collection):
     try:
-        data = paraphrase_embeddings_df
-        embeddings = data.iloc[:, 1:].values  # All columns except the first (chunk text)
-        embeddings = np.ascontiguousarray(embeddings, dtype=np.float32)
-
-        model = SentenceTransformer('paraphrase-mpnet-base-v2')
-        sentence_embedding = model.encode([search_sentence])
-
-        # Ensuring the sentence embedding is in the correct format
-        sentence_embedding = np.ascontiguousarray(sentence_embedding, dtype=np.float32)
-        # Searching for the top 3 nearest neighbors in the FAISS index
-        D, I = index.search(sentence_embedding, k=3)
-        # Printing the top 3 most similar text chunks
-        retrieved_chunks_list = []
-        for idx in I[0]:
-            retrieved_chunks_list.append(data.iloc[idx].chunk)
+        results = chroma_collection.query(query_texts=query, n_results=5, include=['documents', 'embeddings'])
+        retrieved_chunks_list = results['documents'][0]
 
     except Exception:
         retrieved_chunks_list = []
@@ -250,9 +234,9 @@ def initialize_file(added_files):
 
 def initialize_vdb(temp_file_paths):
     with st.spinner('Constructing vector database from provided materials...'):
-        embeddings_df, faiss_index = constructVDB(temp_file_paths)
+        chroma_collection = constructVDB(temp_file_paths)
     st.success("Constructing vector database from provided materials...Done")
-    return embeddings_df, faiss_index
+    return chroma_collection
 
 def initialize_outline(client, temp_file_paths, num_lessons, language, model):
     with st.spinner('Generating Course Outline...'):
@@ -269,8 +253,8 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
         st.markdown(course_outline_string)
     return course_outline_list
 
-def visualize_new_content(client, count_generating_content, lesson_description, embeddings_df, faiss_index, language, style_options, model):
-    retrievedChunksList = searchVDB(lesson_description, embeddings_df, faiss_index)
+def visualize_new_content(client, count_generating_content, lesson_description, chroma_collection, language, style_options, model):
+    retrievedChunksList = searchVDB(lesson_description, chroma_collection)
     with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
         courseContent = write_one_lesson(
             client, 
@@ -328,10 +312,8 @@ def initialize_session_state():
     """
     if "temp_file_paths" not in ss:
         ss.temp_file_paths = ''
-    if "embeddings_df" not in ss:
-        ss.embeddings_df = ''
-    if "faiss_index" not in ss:
-        ss.faiss_index = ''
+    if "chroma_collection" not in ss:
+        ss.chroma_collection = ''
     if "course_outline_list" not in ss:
         ss.course_outline_list = []
     if "course_content_list" not in ss:
@@ -362,7 +344,7 @@ def initialize_session_state():
 
 def display_current_status_col1(write_description, description):
     if ss.course_outline_list == []:
-        if ss.embeddings_df != '' or ss.faiss_index != '':
+        if ss.chroma_collection != '':
             write_description.markdown(description, unsafe_allow_html=True)
             st.success('Processing file...Done')
             st.success("Constructing vector database from provided materials...Done")
@@ -520,7 +502,7 @@ def app():
             with col1:
                 if ss.course_outline_list == []:
                     ss.temp_file_paths = initialize_file(added_files)
-                    ss.embeddings_df, ss.faiss_index = initialize_vdb(ss.temp_file_paths)
+                    ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
@@ -529,8 +511,7 @@ def app():
                         client, 
                         ss.lesson_counter, 
                         ss.course_outline_list[ss.lesson_counter-1], 
-                        ss.embeddings_df, 
-                        ss.faiss_index, 
+                        ss.chroma_collection, 
                         ss.language, 
                         ss.style_options, 
                         ss["openai_model"]
@@ -545,8 +526,7 @@ def app():
                             client,
                             ss.lesson_counter,
                             ss.course_outline_list[ss.lesson_counter-1],
-                            ss.embeddings_df,
-                            ss.faiss_index, 
+                            ss.chroma_collection,
                             ss.language, 
                             ss.style_options, 
                             ss["openai_model"]
@@ -584,7 +564,7 @@ def app():
                 write_description, 
                 description, 
             )
-        elif ss["OPENAI_API_KEY"] != '' and ss.faiss_index == '':
+        elif ss["OPENAI_API_KEY"] != '' and ss.chroma_collection == '':
             display_warning_upload_materials_vdb()
             display_current_status(
                 write_description, 
@@ -612,7 +592,7 @@ def app():
                 with st.chat_message("user"):
                     st.markdown(user_question)
 
-                retrieved_chunks_for_user = searchVDB(user_question, ss.embeddings_df, ss.faiss_index)
+                retrieved_chunks_for_user = searchVDB(user_question, ss.chroma_collection)
                 prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
                 ss.messages.append({"role": "user", "content": prompt})
 
