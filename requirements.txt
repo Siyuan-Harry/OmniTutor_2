@@ -1,8 +1,6 @@
-faiss_cpu==1.7.3
+chromadb==0.4.10
+langchain==0.1.9
 nltk==3.8.1
-numpy==1.25.0
-openai==1.7.1
-pandas==2.0.2
+openai==1.13.3
 PyPDF2==3.0.1
-sentence_transformers==2.2.2
-streamlit==1.30.0
+streamlit==1.24.0
