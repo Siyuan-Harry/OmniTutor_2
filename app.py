@@ -1,13 +1,6 @@
-import pandas as pd
-import numpy as np
-import chromadb
-from langchain.text_splitter import RecursiveCharacterTextSplitter, SentenceTransformersTokenTextSplitter
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from raw_functions import *
+from status_display import *
 from openai import OpenAI
-import tempfile
-from PyPDF2 import PdfReader
-from sentence_transformers import SentenceTransformer
-import time
 import streamlit as st
 
 def app():
@@ -200,6 +193,7 @@ def app():
                     )
                 ss.messages.append({"role": "assistant", "content": full_response})
                 ss.messages_ui.append({"role": "assistant", "content": full_response})
+
 
 
 if __name__ == "__main__":
