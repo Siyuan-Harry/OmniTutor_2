@@ -137,7 +137,7 @@ def _chunk_texts(texts):
 
     return token_split_texts
 
-def constructVDB(file_paths, collection_name='user_upload', embedding_function=SentenceTransformerEmbeddingFunction):
+def constructVDB(file_paths, collection_name='user_upload', embedding_function=SentenceTransformerEmbeddingFunction()):
     texts = ""
     for filename in file_paths:
         with open(filename, 'r') as f:
