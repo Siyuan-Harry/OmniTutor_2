@@ -4,5 +4,4 @@ nltk==3.8.1
 openai==1.13.3
 PyPDF2==3.0.1
 streamlit==1.24.0
-pysqlite3-binary
 

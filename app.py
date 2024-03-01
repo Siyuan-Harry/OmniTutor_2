@@ -2,9 +2,6 @@ from raw_functions import *
 from status_display import *
 from openai import OpenAI
 import streamlit as st
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 def app():
     initialize_session_state()
