@@ -12,7 +12,7 @@ import streamlit as st
 
 def app():
     initialize_session_state()
-    
+
     with st.sidebar:
         api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
         use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
@@ -147,7 +147,6 @@ def app():
             display_warning_upload_materials()
             write_description.markdown(description, unsafe_allow_html=True)
 
-    
 
     if user_question:
         write_description.empty()
