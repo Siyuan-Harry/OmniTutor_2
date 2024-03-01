@@ -39,8 +39,9 @@ def app():
         </style>
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
+
     description = """
-            <font color = 'grey'> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </font> :100:
+            <p style = "color: grey;"> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </p> :100:
             
             Github Repo: https://github.com/Siyuan-Harry/OmniTutor_2
             - Github Repo (for OmniTutor prototype version): https://github.com/Siyuan-Harry/OmniTutor 
