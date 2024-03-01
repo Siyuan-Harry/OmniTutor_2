@@ -37,8 +37,8 @@ def initialize_session_state():
 
     if "start_learning" not in ss:
         ss.start_learning = 0
-    if "is_displaying_description" not in ss:
-        ss.is_displaying_description = 0
+    if "current_status_displayed" not in ss:
+        ss.current_status_displayed = 0
 
 def initialize_file(added_files):
     temp_file_paths = []
@@ -120,40 +120,52 @@ def regenerate_content(course_content_list):
         pass
 
 def display_current_status_col1(write_description, description):
-    if ss.course_outline_list == []:
-        if ss.chroma_collection != '':
-            write_description.markdown(description, unsafe_allow_html=True)
-            st.success('Processing file...Done')
-            st.success("Constructing vector database from provided materials...Done")
+    if ss.current_status_displayed == 0:
+        ss.current_status_displayed == 1
+        if ss.course_outline_list == []:
+            if ss.chroma_collection != '':
+                write_description.markdown(description, unsafe_allow_html=True)
+                st.success('Processing file...Done')
+                st.success("Constructing vector database from provided materials...Done")
+            else:
+                write_description.markdown(description, unsafe_allow_html=True)
+        elif ss.course_outline_list != [] and ss.course_content_list == []:
+            regenerate_outline(ss.course_outline_list)
         else:
-            write_description.markdown(description, unsafe_allow_html=True)
-    elif ss.course_outline_list != [] and ss.course_content_list == []:
-        regenerate_outline(ss.course_outline_list)
+            regenerate_outline(ss.course_outline_list)
+            regenerate_content(ss.course_content_list)
     else:
-        regenerate_outline(ss.course_outline_list)
-        regenerate_content(ss.course_content_list)
+        pass
     
 def display_current_status_col2():
-    st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
-    with st.chat_message("assistant"):
-        st.markdown("Hello👋, how can I help you today? 😄")
-    if ss.messages_ui != []:
-        for message in ss.messages_ui:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+    if ss.current_status_displayed == 0:
+        ss.current_status_displayed == 1
+        st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+        with st.chat_message("assistant"):
+            st.markdown("Hello👋, how can I help you today? 😄")
+        if ss.messages_ui != []:
+            for message in ss.messages_ui:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+        else:
+            pass
     else:
         pass
 
 def display_current_status(write_description, description):
-    if ss.start_learning == 0:
-        write_description.markdown(description)
-    elif ss.start_learning == 1:
-        write_description.empty()
-        col1, col2 = st.columns([0.6,0.4])
-        with col1:
-            display_current_status_col1(write_description, description)
-        with col2:
-            display_current_status_col2()
+    if ss.current_status_displayed == 0:
+        ss.current_status_displayed == 1
+        if ss.start_learning == 0:
+            write_description.markdown(description)
+        elif ss.start_learning == 1:
+            write_description.empty()
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1(write_description, description)
+            with col2:
+                display_current_status_col2()
+    else:
+        pass
 
 def display_warning_api_key():
     warning_api_key = st.empty()

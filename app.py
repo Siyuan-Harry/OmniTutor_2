@@ -69,10 +69,13 @@ def app():
     
     user_question = st.chat_input("Enter your questions when learning...")
 
+    #displaying current status
+    if ss.start_learning == 1:
+        display_current_status(write_description, description)
+
     if btn_next:
         write_description.empty()
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
-            
             ss.start_learning = 1
             ss.num_lessons = num_lessons
             ss.style_options = add_prompt_course_style(custom_options)
@@ -119,7 +122,7 @@ def app():
                             ss["openai_model"]
                         )
                         ss.course_content_list.append(new_lesson)
-                    else:
+                    elif ss.lesson_counter >= ss.num_lessons:
                         display_current_status_col1(write_description, description)
                         #让用户下载课程的文稿markdown
                         course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
