@@ -7,7 +7,7 @@
 ## app links: 
 
 - **Prototype version (OmniTutor)**: https://huggingface.co/spaces/Siyuan0730/OmniTutor
-- **This brand-new version (OmniTutor 2.0)**: https://omnitutor2-qjmzigr9qpyekfufsd2wjv.streamlit.app/
+- **This brand-new version (OmniTutor 2.0)**: https://omnitutor2-dafltkkkprbocbvmesc96b.streamlit.app/
 
 ## Introduction
 
