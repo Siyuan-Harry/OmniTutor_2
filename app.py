@@ -194,8 +194,6 @@ def app():
                 ss.messages.append({"role": "assistant", "content": full_response})
                 ss.messages_ui.append({"role": "assistant", "content": full_response})
 
-
-
 if __name__ == "__main__":
     app()
 
