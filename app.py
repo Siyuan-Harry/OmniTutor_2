@@ -20,7 +20,6 @@ def app():
             )
             ss.language = 'English'
             Chinese = st.checkbox('Output in Chinese')
-        btn_next = st.button('Okay, next learning step! ⏩️')
     
     st.title("OmniTutor 2.0")
     st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
@@ -67,7 +66,10 @@ def app():
     write_description = st.empty()
     write_description.markdown(description, unsafe_allow_html=True)
     
+    btn_next = st.button('Okay, next learning step! ⏩️')
+
     user_question = st.chat_input("Enter your questions when learning...")
+
 
     #displaying current status
     if ss.start_learning == 1:
@@ -94,6 +96,7 @@ def app():
                     ss.temp_file_paths = initialize_file(added_files)
                     ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
+                    btn_next = st.button('Okay, next learning step! ⏩️')
                 elif ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
                     ss.lesson_counter = 1
@@ -107,6 +110,7 @@ def app():
                         ss["openai_model"]
                     )
                     ss.course_content_list.append(new_lesson)
+                    btn_next = st.button('Okay, next learning step! ⏩️')
                 else:
                     if ss.lesson_counter < ss.num_lessons:
                         regenerate_outline(ss.course_outline_list)
@@ -122,6 +126,7 @@ def app():
                             ss["openai_model"]
                         )
                         ss.course_content_list.append(new_lesson)
+                        btn_next = st.button('Okay, next learning step! ⏩️')
                     elif ss.lesson_counter >= ss.num_lessons:
                         display_current_status_col1(write_description, description)
                         #让用户下载课程的文稿markdown
@@ -131,6 +136,7 @@ def app():
                             data=course_md,
                             file_name='OmniTutor_Your_Course.md',
                         )
+                        btn_next = st.button('Okay, next learning step! ⏩️')
             with col2:
                 display_current_status_col2()
         elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
