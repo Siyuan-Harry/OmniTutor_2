@@ -66,16 +66,15 @@ def app():
     write_description = st.empty()
     write_description.markdown(description, unsafe_allow_html=True)
     
-    btn_next = st.button('Okay, next learning step! ⏩️')
+    btn_start = st.button('Start Learning')
 
     user_question = st.chat_input("Enter your questions when learning...")
-
 
     #displaying current status
     if ss.start_learning == 1:
         display_current_status(write_description, description)
 
-    if btn_next:
+    if btn_start:
         write_description.empty()
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
             ss.start_learning = 1
@@ -92,12 +91,28 @@ def app():
 
             col1, col2 = st.columns([0.6,0.4])
             with col1:
-                if ss.course_outline_list == []:
+                if len(ss["OPENAI_API_KEY"]) != 51 and added_files:
+                    display_warning_api_key()
+                    display_current_status(
+                        write_description, 
+                        description, 
+                    )
+                elif not added_files:
+                    write_description.empty()
+                    display_warning_upload_materials()
+                    write_description.markdown(description, unsafe_allow_html=True)
+                else:
                     ss.temp_file_paths = initialize_file(added_files)
                     ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
                     ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
                     btn_next = st.button('Okay, next learning step! ⏩️')
-                elif ss.course_outline_list != [] and ss.course_content_list == []:
+
+    if btn_next:
+        write_description.empty()
+        if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                if ss.course_outline_list != [] and ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
                     ss.lesson_counter = 1
                     new_lesson = visualize_new_content(
@@ -139,16 +154,6 @@ def app():
                         btn_next = st.button('Okay, next learning step! ⏩️')
             with col2:
                 display_current_status_col2()
-        elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
-            display_warning_api_key()
-            display_current_status(
-                write_description, 
-                description, 
-            )
-        elif not added_files:
-            write_description.empty()
-            display_warning_upload_materials()
-            write_description.markdown(description, unsafe_allow_html=True)
 
 
     if user_question:

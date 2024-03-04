@@ -205,3 +205,4 @@ def convert_markdown_string(course_outline_list, course_content_list):
         course_markdown_string += f"{content}\n\n"
 
     return course_markdown_string
+
