@@ -39,6 +39,8 @@ def initialize_session_state():
         ss.start_learning = 0
     if "current_status_displayed" not in ss:
         ss.current_status_displayed = 0
+    if "main_page_displayed" not in ss:
+        ss.main_page_displayed = True
 
 def initialize_file(added_files):
     temp_file_paths = []
@@ -119,23 +121,50 @@ def regenerate_content(course_content_list):
         display_general_warning()
         pass
 
-def display_current_status_col1(write_description, description):
-    if ss.current_status_displayed == 0:
-        ss.current_status_displayed == 1
-        if ss.course_outline_list == []:
-            if ss.chroma_collection != '':
-                write_description.markdown(description, unsafe_allow_html=True)
-                st.success('Processing file...Done')
-                st.success("Constructing vector database from provided materials...Done")
-            else:
-                write_description.markdown(description, unsafe_allow_html=True)
-        elif ss.course_outline_list != [] and ss.course_content_list == []:
-            regenerate_outline(ss.course_outline_list)
-        else:
-            regenerate_outline(ss.course_outline_list)
-            regenerate_content(ss.course_content_list)
+def display_main_page(is_visulized):
+    description = """
+            <p style = "color: grey;"> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </p> :100:
+            
+            Github Repo: https://github.com/Siyuan-Harry/OmniTutor_2
+            - Github Repo (for OmniTutor prototype version): https://github.com/Siyuan-Harry/OmniTutor 
+
+            ### ✨ Key features                                           
+                                                    
+            - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
+            - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
+            - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
+            - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
+            
+            ### 🏃‍♂️ Get started!
+                                                        
+            1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
+            2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
+            3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
+            4. **Start course generating**: <font color = 'grey'>Touch "Next Leaning Step!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
+            5. **Interactive course generation**: <font color = 'grey'>Whenever you finish one leaning step, ouch "Next Leaning Step!" button to continue. You will never be left behind.</font>
+            6. **Interactive learning**: <font color = 'grey'>Ask OmniTutor any questions related to this course whenever you encountered them.</font>
+                                    
+            ###### 🎉 Have fun playing with Omnitutor!                                                                                                              
+            """
+    main_page = st.empty()
+    if is_visulized:
+        with main_page.container():
+            st.markdown(description, unsafe_allow_html=True)
     else:
-        pass
+        main_page.empty()
+
+def display_current_status_col1():
+    if ss.course_outline_list == []:
+        if ss.chroma_collection != '':
+            st.success('Processing file...Done')
+            st.success("Constructing vector database from provided materials...Done")
+        else:
+            ss.main_page_displayed = True
+    elif ss.course_outline_list != [] and ss.course_content_list == []:
+        regenerate_outline(ss.course_outline_list)
+    else:
+        regenerate_outline(ss.course_outline_list)
+        regenerate_content(ss.course_content_list)
     
 def display_current_status_col2():
     if ss.current_status_displayed == 0:
@@ -152,20 +181,16 @@ def display_current_status_col2():
     else:
         pass
 
-def display_current_status(write_description, description):
-    if ss.current_status_displayed == 0:
-        ss.current_status_displayed == 1
-        if ss.start_learning == 0:
-            write_description.markdown(description)
-        elif ss.start_learning == 1:
-            write_description.empty()
-            col1, col2 = st.columns([0.6,0.4])
-            with col1:
-                display_current_status_col1(write_description, description)
-            with col2:
-                display_current_status_col2()
-    else:
-        pass
+def display_current_status():
+    if ss.start_learning == 0:
+        ss.main_page_displayed = False
+    elif ss.start_learning == 1:
+        display_main_page(False)
+        col1, col2 = st.columns([0.6,0.4])
+        with col1:
+            display_current_status_col1()
+        with col2:
+            display_current_status_col2()
 
 def display_warning_api_key():
     warning_api_key = st.empty()

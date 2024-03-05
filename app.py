@@ -22,6 +22,7 @@ def app():
             Chinese = st.checkbox('Output in Chinese')
         btn_next = st.button('Okay, next learning step! ⏩️')
     
+    # unchangable layout
     st.title("OmniTutor 2.0")
     st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
     st.markdown("""
@@ -39,42 +40,16 @@ def app():
         </style>
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
-
-    description = """
-            <p style = "color: grey;"> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </p> :100:
-            
-            Github Repo: https://github.com/Siyuan-Harry/OmniTutor_2
-            - Github Repo (for OmniTutor prototype version): https://github.com/Siyuan-Harry/OmniTutor 
-
-            ### ✨ Key features                                           
-                                                    
-            - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
-            - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
-            - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
-            - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
-            
-            ### 🏃‍♂️ Get started!
-                                                        
-            1. **Input Your OpenAI API Key**: <font color = 'grey'>Give OmniTutor your own OpenAI API key (On top of the **sidebar**) to get started.</font>
-            2. **Upload learning materials**: <font color = 'grey'>The upload widget in the sidebar supports PDF and .md files simutaenously.</font>
-            3. **Customize your course**: <font color = 'grey'>By few clicks and swipes, adjusting teaching style, lesson count and language for your course.</font>
-            4. **Start course generating**: <font color = 'grey'>Touch "Next Leaning Step!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.</font>
-            5. **Interactive course generation**: <font color = 'grey'>Whenever you finish one leaning step, ouch "Next Leaning Step!" button to continue. You will never be left behind.</font>
-            6. **Interactive learning**: <font color = 'grey'>Ask OmniTutor any questions related to this course whenever you encountered them.</font>
-                                    
-            ###### 🎉 Have fun playing with Omnitutor!                                                                                                              
-            """
-    write_description = st.empty()
-    write_description.markdown(description, unsafe_allow_html=True)
     
     user_question = st.chat_input("Enter your questions when learning...")
 
     #displaying current status
-    if ss.start_learning == 1:
-        display_current_status(write_description, description)
+    #if ss.start_learning == 1:
+    #    display_current_status(write_description, description)
+    display_main_page(ss.main_page_displayed)
 
     if btn_next:
-        write_description.empty()
+        ss.main_page_displayed = False
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
             ss.start_learning = 1
             ss.num_lessons = num_lessons
@@ -123,7 +98,7 @@ def app():
                         )
                         ss.course_content_list.append(new_lesson)
                     elif ss.lesson_counter >= ss.num_lessons:
-                        display_current_status_col1(write_description, description)
+                        display_current_status_col1()
                         #让用户下载课程的文稿markdown
                         course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
                         st.download_button(
@@ -134,36 +109,28 @@ def app():
             with col2:
                 display_current_status_col2()
         elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
+            ss.main_page_displayed = False
             display_warning_api_key()
-            display_current_status(
-                write_description, 
-                description, 
-            )
+            ss.main_page_displayed = True
         elif not added_files:
-            write_description.empty()
+            ss.main_page_displayed = False
             display_warning_upload_materials()
-            write_description.markdown(description, unsafe_allow_html=True)
+            ss.main_page_displayed = True
 
 
     if user_question:
-        write_description.empty()
+        ss.main_page_displayed = False
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
-            display_current_status(
-                write_description, 
-                description, 
-            )
+            display_current_status()
         elif ss["OPENAI_API_KEY"] != '' and ss.chroma_collection == '':
             display_warning_upload_materials_vdb()
-            display_current_status(
-                write_description, 
-                description, 
-            )
+            display_current_status()
         else:
             client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             col1, col2 = st.columns([0.6,0.4])
             with col1:
-                display_current_status_col1(write_description, description)
+                display_current_status_col1()
             with col2:
                 st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
