@@ -41,6 +41,7 @@ def app():
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
     
+    display_main_page(False)
     st.write(ss.main_page_displayed)
     display_main_page(ss.main_page_displayed)
 
