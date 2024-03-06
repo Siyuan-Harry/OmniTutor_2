@@ -20,7 +20,7 @@ def app():
             )
             ss.language = 'English'
             Chinese = st.checkbox('Output in Chinese')
-        btn_next = st.button('Okay, next learning step! ⏩️')
+        
     
     # unchangable layout
     st.title("OmniTutor 2.0")
@@ -42,7 +42,7 @@ def app():
     """, unsafe_allow_html=True)
     
     st.write(ss.main_page_displayed)
-    display_main_page(ss.main_page_displayed)
+    btn_start, main_page_content = display_main_page(ss.main_page_displayed)
 
     user_question = st.chat_input("Enter your questions when learning...")
 
@@ -50,7 +50,8 @@ def app():
     #if ss.start_learning == 1:
     #    display_current_status(write_description, description)
 
-    if btn_next:
+    if btn_start:
+        main_page_content.empty() #clear main page on first interact
         ss.main_page_displayed = False
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
             ss.start_learning = 1
@@ -67,57 +68,63 @@ def app():
 
             col1, col2 = st.columns([0.6,0.4])
             with col1:
-                if ss.course_outline_list == []:
-                    ss.temp_file_paths = initialize_file(added_files)
-                    ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
-                    ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
-                elif ss.course_outline_list != [] and ss.course_content_list == []:
-                    regenerate_outline(ss.course_outline_list)
-                    ss.lesson_counter = 1
-                    new_lesson = visualize_new_content(
-                        client, 
-                        ss.lesson_counter, 
-                        ss.course_outline_list[ss.lesson_counter-1], 
-                        ss.chroma_collection, 
-                        ss.language, 
-                        ss.style_options, 
-                        ss["openai_model"]
-                    )
-                    ss.course_content_list.append(new_lesson)
-                else:
-                    if ss.lesson_counter < ss.num_lessons:
-                        regenerate_outline(ss.course_outline_list)
-                        regenerate_content(ss.course_content_list)
-                        ss.lesson_counter += 1
-                        new_lesson = visualize_new_content(
-                            client,
-                            ss.lesson_counter,
-                            ss.course_outline_list[ss.lesson_counter-1],
-                            ss.chroma_collection,
-                            ss.language, 
-                            ss.style_options, 
-                            ss["openai_model"]
-                        )
-                        ss.course_content_list.append(new_lesson)
-                    elif ss.lesson_counter >= ss.num_lessons:
-                        display_current_status_col1()
-                        #让用户下载课程的文稿markdown
-                        course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
-                        st.download_button(
-                            label="Download Course Script",
-                            data=course_md,
-                            file_name='OmniTutor_Your_Course.md',
-                        )
+                ss.temp_file_paths = initialize_file(added_files)
+                ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
+                ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
+                btn_next = st.button('Next learning step ⏩️')
             with col2:
                 display_current_status_col2()
         elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
-            ss.main_page_displayed = False
+            # here, need to clear the screen
             display_warning_api_key()
-            ss.main_page_displayed = True
         elif not added_files:
-            ss.main_page_displayed = False
+            # here, need to clear the screen
             display_warning_upload_materials()
-            ss.main_page_displayed = True
+    
+    if btn_next:
+        if ss.course_outline_list != [] and ss.course_content_list == []:
+            regenerate_outline(ss.course_outline_list)
+            ss.lesson_counter = 1
+            new_lesson = visualize_new_content(
+                client, 
+                ss.lesson_counter, 
+                ss.course_outline_list[ss.lesson_counter-1], 
+                ss.chroma_collection, 
+                ss.language, 
+                ss.style_options, 
+                ss["openai_model"]
+            )
+            ss.course_content_list.append(new_lesson)
+            btn_next = st.button('Next learning step ⏩️')
+        else:
+            if ss.lesson_counter < ss.num_lessons:
+                regenerate_outline(ss.course_outline_list)
+                regenerate_content(ss.course_content_list)
+                ss.lesson_counter += 1
+                new_lesson = visualize_new_content(
+                    client,
+                    ss.lesson_counter,
+                    ss.course_outline_list[ss.lesson_counter-1],
+                    ss.chroma_collection,
+                    ss.language, 
+                    ss.style_options, 
+                    ss["openai_model"]
+                )
+                ss.course_content_list.append(new_lesson)
+                btn_next = st.button('Next learning step ⏩️')
+            elif ss.lesson_counter >= ss.num_lessons:
+                display_current_status_col1()
+                #让用户下载课程的文稿markdown
+                course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
+                st.download_button(
+                    label="Download Course Script",
+                    data=course_md,
+                    file_name='OmniTutor_Your_Course.md',
+                )
+            with col2:
+                display_current_status_col2()
+        
+        
 
 
     if user_question:

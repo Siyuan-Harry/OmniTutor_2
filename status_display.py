@@ -148,6 +148,8 @@ def display_main_page(is_visualized):
     if is_visualized:
         with main_page.container():
             st.markdown(description, unsafe_allow_html=True)
+            btn_start = st.button('Okay, next learning step! ⏩️')
+        return btn_start, main_page
     else:
         main_page.empty()
 
