@@ -37,8 +37,6 @@ def initialize_session_state():
 
     if "start_learning" not in ss:
         ss.start_learning = 0
-    if "current_status_displayed" not in ss:
-        ss.current_status_displayed = 0
     if "main_page_displayed" not in ss:
         ss.main_page_displayed = True
 
@@ -121,7 +119,7 @@ def regenerate_content(course_content_list):
         display_general_warning()
         pass
 
-def display_main_page(is_visulized):
+def display_main_page(is_visualized):
     description = """
             <p style = "color: grey;"> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </p> :100:
             
@@ -147,7 +145,7 @@ def display_main_page(is_visulized):
             ###### 🎉 Have fun playing with Omnitutor!                                                                                                              
             """
     main_page = st.empty()
-    if is_visulized:
+    if is_visualized:
         with main_page.container():
             st.markdown(description, unsafe_allow_html=True)
     else:
@@ -167,17 +165,13 @@ def display_current_status_col1():
         regenerate_content(ss.course_content_list)
     
 def display_current_status_col2():
-    if ss.current_status_displayed == 0:
-        ss.current_status_displayed == 1
-        st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
-        with st.chat_message("assistant"):
-            st.markdown("Hello👋, how can I help you today? 😄")
-        if ss.messages_ui != []:
-            for message in ss.messages_ui:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-        else:
-            pass
+    st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+    with st.chat_message("assistant"):
+        st.markdown("Hello👋, how can I help you today? 😄")
+    if ss.messages_ui != []:
+        for message in ss.messages_ui:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
     else:
         pass
 
@@ -230,3 +224,4 @@ def convert_markdown_string(course_outline_list, course_content_list):
         course_markdown_string += f"{content}\n\n"
 
     return course_markdown_string
+

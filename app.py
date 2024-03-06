@@ -41,12 +41,14 @@ def app():
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
     
+    st.write(ss.main_page_displayed)
+    display_main_page(ss.main_page_displayed)
+
     user_question = st.chat_input("Enter your questions when learning...")
 
     #displaying current status
     #if ss.start_learning == 1:
     #    display_current_status(write_description, description)
-    display_main_page(ss.main_page_displayed)
 
     if btn_next:
         ss.main_page_displayed = False
