@@ -57,8 +57,8 @@ def app():
 
     # must divide btn_start and btn_next
     if btn_start:
-        ss.main_page_displayed = False
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
+            ss.main_page_displayed = False
             ss.start_learning = 1
             ss.num_lessons = num_lessons
             ss.style_options = add_prompt_course_style(custom_options)
