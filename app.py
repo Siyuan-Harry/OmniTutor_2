@@ -105,6 +105,8 @@ def app():
                 ss["openai_model"]
             )
             ss.course_content_list.append(new_lesson)
+        elif ss.num_lessons == 0:
+            display_warning_not_started()
         else:
             if ss.lesson_counter < ss.num_lessons:
                 regenerate_outline(ss.course_outline_list)

@@ -31,7 +31,7 @@ def initialize_session_state():
         ss.messages = []
 
     if "num_lessons" not in ss:
-        ss.num_lessons = ''
+        ss.num_lessons = 0
     if "language" not in ss:
         ss.language = ''
     if "style_options" not in ss:
@@ -150,19 +150,19 @@ def display_main_page(is_visualized):
     if is_visualized:
         with main_page.container():
             st.markdown(description, unsafe_allow_html=True)
-            btn_start = st.button('Okay, next learning step! ⏩️')
+            btn_start = st.button('Start learning!')
             api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
             use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
             added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
             with st.expander('⚙️ Customize my course'):
-                    num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
-                    custom_options = st.multiselect(
-                        'Preferred teaching style :grey[(Recommend new users not to select)]',
-                        ['More examples', 'More excercises', 'Easier to learn'],
-                        max_selections = 2
-                    )
-                    ss.language = 'English'
-                    Chinese = st.checkbox('Output in Chinese')
+                num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
+                custom_options = st.multiselect(
+                    'Preferred teaching style :grey[(Recommend new users not to select)]',
+                    ['More examples', 'More excercises', 'Easier to learn'],
+                    max_selections = 2
+                )
+                ss.language = 'English'
+                Chinese = st.checkbox('Output in Chinese')
         return api_key, use_35, added_files, num_lessons, custom_options, Chinese, btn_start
     else:
         main_page.empty()
@@ -202,6 +202,12 @@ def display_current_status():
             display_current_status_col1()
         with col2:
             display_current_status_col2()
+
+def display_warning_not_started():
+    warning_not_started = st.empty()
+    warning_not_started.warning("The learning haven't stated yet, please start to learn first!", icon="⚠️")
+    time.sleep(2)
+    warning_not_started.empty()
 
 def display_warning_api_key():
     warning_api_key = st.empty()
