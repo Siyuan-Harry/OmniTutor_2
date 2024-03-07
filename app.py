@@ -129,8 +129,8 @@ def app():
                     data=course_md,
                     file_name='OmniTutor_Your_Course.md',
                 )
-            with col2:
-                display_current_status_col2()
+        with col2:
+            display_current_status_col2()
 
     if visualize_learning:
         if ss.start_learning == 0:
