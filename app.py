@@ -11,7 +11,6 @@ def app():
         visualize_learning = st.checkbox('📚 Visualize learning process')
         #visualize_rag
         btn_next = st.button('Next learning step ⏩️')
-        
     
     # unchangable layout
     st.title("OmniTutor 2.0")
@@ -34,15 +33,21 @@ def app():
     
     st.write(ss.main_page_displayed)
 
-    (
-        api_key, 
-        use_35, 
-        added_files, 
-        num_lessons, 
-        custom_options, 
-        Chinese, 
-        btn_start
-    ) = display_main_page(ss.main_page_displayed)
+    settings = display_main_page(ss.main_page_displayed)
+
+    # display main page and initialize settings from it
+    if settings is not None:
+        (
+            api_key, 
+            use_35, 
+            added_files, 
+            num_lessons, 
+            custom_options, 
+            Chinese, 
+            btn_start
+        ) = settings
+    else:
+        api_key = use_35 = added_files = num_lessons = custom_options = Chinese = btn_start = None
 
     user_question = st.chat_input("Enter your questions when learning...")
 

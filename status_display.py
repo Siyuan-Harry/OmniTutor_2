@@ -164,6 +164,7 @@ def display_main_page(is_visualized):
         return api_key, use_35, added_files, num_lessons, custom_options, Chinese, btn_start
     else:
         main_page.empty()
+        return None
 
 def display_current_status_col1():
     if ss.course_outline_list == []:
