@@ -23,6 +23,8 @@ def initialize_session_state():
         ss["OPENAI_API_KEY"] = ''
     if "openai_model" not in ss:
         ss["openai_model"] = 'gpt-4-1106-preview' 
+    if "client" not in ss:
+        ss.client = ''
     if "messages_ui" not in ss:
         ss.messages_ui = []
     if "messages" not in ss:

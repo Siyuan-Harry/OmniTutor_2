@@ -55,6 +55,7 @@ def app():
     #if ss.start_learning == 1:
     #    display_current_status(write_description, description)
 
+    # must divide btn_start and btn_next
     if btn_start:
         ss.main_page_displayed = False
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
@@ -67,14 +68,20 @@ def app():
             if Chinese:
                 ss.language = "Chinese"
             if use_35:
-                ss["openai_model"] = 'gpt-3.5-turbo-1106'
-            client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+                ss["openai_model"] = 'gpt-3.5-turbo'
+            ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
 
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 ss.temp_file_paths = initialize_file(added_files)
                 ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
-                ss.course_outline_list = initialize_outline(client, ss.temp_file_paths, num_lessons, ss.language, ss["openai_model"])
+                ss.course_outline_list = initialize_outline(
+                    ss.client, 
+                    ss.temp_file_paths, 
+                    num_lessons, 
+                    ss.language, 
+                    ss["openai_model"]
+                )
             with col2:
                 display_current_status_col2()
         elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
@@ -89,7 +96,7 @@ def app():
             regenerate_outline(ss.course_outline_list)
             ss.lesson_counter = 1
             new_lesson = visualize_new_content(
-                client, 
+                ss.client, 
                 ss.lesson_counter, 
                 ss.course_outline_list[ss.lesson_counter-1], 
                 ss.chroma_collection, 
@@ -104,7 +111,7 @@ def app():
                 regenerate_content(ss.course_content_list)
                 ss.lesson_counter += 1
                 new_lesson = visualize_new_content(
-                    client,
+                    ss.client,
                     ss.lesson_counter,
                     ss.course_outline_list[ss.lesson_counter-1],
                     ss.chroma_collection,
@@ -124,9 +131,12 @@ def app():
                 )
             with col2:
                 display_current_status_col2()
-        
-        
 
+    if visualize_learning:
+        if ss.start_learning == 0:
+            st.write('Learning not started yet..')
+        else:
+            display_current_status()
 
     if user_question:
         ss.main_page_displayed = False
@@ -137,7 +147,7 @@ def app():
             display_warning_upload_materials_vdb()
             display_current_status()
         else:
-            client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+            ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             col1, col2 = st.columns([0.6,0.4])
             with col1:
                 display_current_status_col1()
@@ -165,7 +175,7 @@ def app():
                 # Display assistant response in chat message container
                 with st.chat_message("assistant"):
                     full_response = get_visualize_stream_completion_from_messages(
-                        client,
+                        ss.client,
                         messages=[
                             {"role": m["role"], "content": m["content"]}
                             for m in st.session_state.messages #用chatbot那边的隐藏消息记录
