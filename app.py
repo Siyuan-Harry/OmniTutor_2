@@ -7,19 +7,9 @@ def app():
     initialize_session_state()
 
     with st.sidebar:
-        api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
-        use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
-        added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
-        with st.expander('⚙️ Customize my course'):
-            num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
-            custom_options = st.multiselect(
-                'Preferred teaching style :grey[(Recommend new users not to select)]',
-                ['More examples', 'More excercises', 'Easier to learn'],
-                max_selections = 2
-            )
-            ss.language = 'English'
-            Chinese = st.checkbox('Output in Chinese')
+        visualize_learning = st.checkbox('📚 Visualize learning process')
+        #visualize_rag
         
     
     # unchangable layout
@@ -42,7 +32,8 @@ def app():
     """, unsafe_allow_html=True)
     
     st.write(ss.main_page_displayed)
-    btn_start, main_page_content = display_main_page(ss.main_page_displayed)
+
+    api_key, use_35, added_files, num_lessons, custom_options, Chinese, btn_start = display_main_page(ss.main_page_displayed)
 
     user_question = st.chat_input("Enter your questions when learning...")
 
@@ -51,7 +42,6 @@ def app():
     #    display_current_status(write_description, description)
 
     if btn_start:
-        main_page_content.empty() #clear main page on first interact
         ss.main_page_displayed = False
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
             ss.start_learning = 1

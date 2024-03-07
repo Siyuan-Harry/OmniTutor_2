@@ -149,7 +149,19 @@ def display_main_page(is_visualized):
         with main_page.container():
             st.markdown(description, unsafe_allow_html=True)
             btn_start = st.button('Okay, next learning step! ⏩️')
-        return btn_start, main_page
+            api_key = st.text_input('🔑 Your OpenAI API key:', 'sk-...')
+            use_35 = st.checkbox('Use GPT-3.5 (GPT-4 is default)')
+            added_files = st.file_uploader('📁 Upload .md or .pdf files, simultaneous mixed upload both types is supported.', type=['.md','.pdf'], accept_multiple_files=True)
+            with st.expander('⚙️ Customize my course'):
+                    num_lessons = st.slider('How many lessons do you want this course to have?', min_value=2, max_value=15, value=5, step=1)
+                    custom_options = st.multiselect(
+                        'Preferred teaching style :grey[(Recommend new users not to select)]',
+                        ['More examples', 'More excercises', 'Easier to learn'],
+                        max_selections = 2
+                    )
+                    ss.language = 'English'
+                    Chinese = st.checkbox('Output in Chinese')
+        return api_key, use_35, added_files, num_lessons, custom_options, Chinese, btn_start
     else:
         main_page.empty()
 
