@@ -8,7 +8,6 @@ def app():
 
     with st.sidebar:
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
-        visualize_learning = st.checkbox('📚 Visualize learning process')
         #visualize_rag
         btn_next = st.button('Next learning step ⏩️')
     
@@ -92,53 +91,57 @@ def app():
             display_warning_upload_materials()
     
     if btn_next:
-        if ss.course_outline_list != [] and ss.course_content_list == []:
-            regenerate_outline(ss.course_outline_list)
-            ss.lesson_counter = 1
-            new_lesson = visualize_new_content(
-                ss.client, 
-                ss.lesson_counter, 
-                ss.course_outline_list[ss.lesson_counter-1], 
-                ss.chroma_collection, 
-                ss.language, 
-                ss.style_options, 
-                ss["openai_model"]
-            )
-            ss.course_content_list.append(new_lesson)
-        elif ss.num_lessons == 0:
+        if ss.num_lessons == 0:
             display_warning_not_started()
         else:
-            if ss.lesson_counter < ss.num_lessons:
-                regenerate_outline(ss.course_outline_list)
-                regenerate_content(ss.course_content_list)
-                ss.lesson_counter += 1
-                new_lesson = visualize_new_content(
-                    ss.client,
-                    ss.lesson_counter,
-                    ss.course_outline_list[ss.lesson_counter-1],
-                    ss.chroma_collection,
-                    ss.language, 
-                    ss.style_options, 
-                    ss["openai_model"]
-                )
-                ss.course_content_list.append(new_lesson)
-            elif ss.lesson_counter >= ss.num_lessons:
-                display_current_status_col1()
-                #让用户下载课程的文稿markdown
-                course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
-                st.download_button(
-                    label="Download Course Script",
-                    data=course_md,
-                    file_name='OmniTutor_Your_Course.md',
-                )
-        with col2:
-            display_current_status_col2()
+            col1, col2 = st.columns([0.6,0.4])
+            with col2:
+                display_current_status_col2()
+            with col1:
+                if ss.course_content_list == []:
+                    regenerate_outline(ss.course_outline_list)
+                    ss.lesson_counter = 1
+                    new_lesson = visualize_new_content(
+                        ss.client, 
+                        ss.lesson_counter, 
+                        ss.course_outline_list[ss.lesson_counter-1], 
+                        ss.chroma_collection, 
+                        ss.language, 
+                        ss.style_options, 
+                        ss["openai_model"]
+                    )
+                    ss.course_content_list.append(new_lesson)
+                elif ss.lesson_counter < ss.num_lessons:
+                    regenerate_outline(ss.course_outline_list)
+                    regenerate_content(ss.course_content_list)
+                    ss.lesson_counter += 1
+                    new_lesson = visualize_new_content(
+                        ss.client,
+                        ss.lesson_counter,
+                        ss.course_outline_list[ss.lesson_counter-1],
+                        ss.chroma_collection,
+                        ss.language, 
+                        ss.style_options, 
+                        ss["openai_model"]
+                    )
+                    ss.course_content_list.append(new_lesson)
+                        
+                elif ss.lesson_counter >= ss.num_lessons:
+                    display_current_status_col1()
+                    #让用户下载课程的文稿markdown
+                    course_md = convert_markdown_string(ss.course_outline_list,ss.course_content_list)
+                    st.download_button(
+                        label="Download Course Script",
+                        data=course_md,
+                        file_name='OmniTutor_Your_Course.md',
+                    )
 
-    if visualize_learning:
-        if ss.start_learning == 0:
-            st.write('Learning not started yet..')
-        else:
-            display_current_status()
+    # 这绝对是个祸害
+    #if visualize_learning:
+    #    if ss.start_learning == 0:
+    #        st.write('Learning not started yet..')
+    #    else:
+    #        display_current_status() #如果重复勾选，会导致重复显示课程内容
 
     if user_question:
         ss.main_page_displayed = False
