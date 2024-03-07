@@ -33,7 +33,15 @@ def app():
     
     st.write(ss.main_page_displayed)
 
-    api_key, use_35, added_files, num_lessons, custom_options, Chinese, btn_start = display_main_page(ss.main_page_displayed)
+    (
+        api_key, 
+        use_35, 
+        added_files, 
+        num_lessons, 
+        custom_options, 
+        Chinese, 
+        btn_start
+    ) = display_main_page(ss.main_page_displayed)
 
     user_question = st.chat_input("Enter your questions when learning...")
 
