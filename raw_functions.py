@@ -121,21 +121,8 @@ def genarating_outline(client, keywords, num_lessons, language, model):
         pass
     return list_response
 
-def _chunk_texts(texts):
-    character_splitter = RecursiveCharacterTextSplitter(
-        separators=["\n\n", "\n", ". ", " ", ""],
-        chunk_size=1000,
-        chunk_overlap=0
-    )
-    character_split_texts = character_splitter.split_text('\n\n'.join(texts))
-
-    token_splitter = SentenceTransformersTokenTextSplitter(chunk_overlap=0, tokens_per_chunk=256)
-
-    token_split_texts = []
-    for text in character_split_texts:
-        token_split_texts += token_splitter.split_text(text)
-
-    return token_split_texts
+def chunkstring(string, length):
+        return list((string[0+i:length+i] for i in range(0, len(string), length)))
 
 def constructVDB(file_paths, collection_name='user_upload', embedding_function=SentenceTransformerEmbeddingFunction()):
     texts = ""
@@ -143,7 +130,7 @@ def constructVDB(file_paths, collection_name='user_upload', embedding_function=S
         with open(filename, 'r') as f:
             content = f.read()
             texts += content
-    chunks = _chunk_texts(texts)
+    chunks = chunkstring(texts, 1000) #1000 characters per chunk
 
     chroma_client = chromadb.Client()
     chroma_collection = chroma_client.create_collection(name=collection_name, embedding_function=embedding_function)
