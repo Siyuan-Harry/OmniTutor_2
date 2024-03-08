@@ -1,5 +1,4 @@
 import chromadb
-from langchain.text_splitter import RecursiveCharacterTextSplitter, SentenceTransformersTokenTextSplitter
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 from PyPDF2 import PdfReader
 import streamlit as st
@@ -124,7 +123,7 @@ def genarating_outline(client, keywords, num_lessons, language, model):
 def chunkstring(string, length):
         return list((string[0+i:length+i] for i in range(0, len(string), length)))
 
-def constructVDB(file_paths, collection_name='user_upload', embedding_function=SentenceTransformerEmbeddingFunction()):
+def constructVDB(file_paths, collection_name='user_upload', embedding_function=SentenceTransformerEmbeddingFunction(model_name="paraphrase-mpnet-base-v2")):
     texts = ""
     for filename in file_paths:
         with open(filename, 'r') as f:
