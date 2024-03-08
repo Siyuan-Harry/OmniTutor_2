@@ -101,6 +101,14 @@ def app():
                 if ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
                     ss.lesson_counter = 1
+                    generating_warning = st.empty()
+                    generating_warning.markdown(
+                        '''
+                        课节生成中，你可以点击展开查看👇，但请**不要触碰**侧边栏 `Next learning step ⏩️` 按钮以避免生成失败。
+                        Lesson script generating. Check out below!👇 
+                        Please **DO NOT** touch `Next learning step ⏩️` button to avoid fail in generating.
+                        '''
+                    )
                     new_lesson = visualize_new_content(
                         ss.client, 
                         ss.lesson_counter, 
@@ -111,6 +119,7 @@ def app():
                         ss["openai_model"]
                     )
                     ss.course_content_list.append(new_lesson)
+                    generating_warning.empty()
                 elif ss.lesson_counter < ss.num_lessons:
                     regenerate_outline(ss.course_outline_list)
                     regenerate_content(ss.course_content_list)
