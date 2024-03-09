@@ -12,7 +12,6 @@ def app():
         st.caption('''
                    An all-round teacher and a personalized teaching assistant who really knows the subject, to help you solve all your learning problems, Make learning so simple: anything, anywhere, all at once.
                    ''')
-        
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
         #visualize_rag
         btn_next = st.button('Next learning step ⏩️')
