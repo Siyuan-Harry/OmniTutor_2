@@ -252,6 +252,12 @@ def convert_markdown_string(course_outline_list, course_content_list):
         lessons_count += 1
         course_markdown_string += f"# Lesson {lessons_count}\n\n"
         course_markdown_string += f"{content}\n\n"
-
+    
+    course_markdown_string += f"# 🦉 Chat History \n\n"
+    for message in ss.messages_ui:
+        if message["role"] == "user":
+            course_markdown_string += f"- Me: \n\n{message['content']} \n\n"
+        elif message["role"] == "assistant":
+            course_markdown_string += f"- Assistant: \n\n{message['content']} \n\n"
     return course_markdown_string
 
