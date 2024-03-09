@@ -70,7 +70,7 @@ Before running , ensure you have the following prerequisites installed:
 - [x] **Generate each lesson with streaming output** to reduce annoying waiting
 - [x] Ask questions as you learn
 - [x] Add **session management system** for robustness
-- [ ] **Update the session management system** to prevent the visual course content from disappearing in some cases
+- [x] **Update the session management system** to prevent the visual course content from disappearing in some cases
 - [ ] **visualize chunks and RAG system** to enhance learners' trust and sense of control over the generated lessons
 - [ ] Make the generated course outline **editable**
 
