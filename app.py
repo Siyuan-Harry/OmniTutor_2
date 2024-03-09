@@ -6,12 +6,17 @@ import streamlit as st
 def app():
     initialize_session_state()
 
+    # unchangable layout
     with st.sidebar:
+        st.title(":grey[OmniTutor 2.0]")
+        st.caption('''
+                   An all-round teacher and a personalized teaching assistant who really knows the subject, to help you solve all your learning problems, Make learning so simple: anything, anywhere, all at once.
+                   ''')
+        
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
         #visualize_rag
         btn_next = st.button('Next learning step ⏩️')
     
-    # unchangable layout
     st.title("OmniTutor 2.0")
     st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
     st.markdown("""
@@ -29,8 +34,6 @@ def app():
         </style>
         <div class="footer">Made with 🧡 by Siyuan</div>
     """, unsafe_allow_html=True)
-    
-    st.write(ss.main_page_displayed)
 
     # display main page and initialize settings from it
     settings = display_main_page(ss.main_page_displayed)
@@ -46,6 +49,14 @@ def app():
         ) = settings
     else:
         api_key = use_35 = added_files = num_lessons = custom_options = Chinese = btn_start = None
+    
+    # If user encounter a blank screen, this will be the only info left on the main page.
+    helpful_info = st.empty()
+    helpful_info.caption('''
+                :blue[**Interactive learning process**]: 
+                - Whenever you feel to continue (or encounter any error), please touch "**Next Leaning Step**" button on sidebar. 
+                - You will never be left behind. 🙌 
+               ''')
 
     # display chat input box
     user_question = st.chat_input("Enter your questions when learning...")
@@ -58,6 +69,7 @@ def app():
     if btn_start:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
             ss.main_page_displayed = False
+            helpful_info.empty()
             ss.start_learning = 1
             ss.num_lessons = num_lessons
             ss.style_options = add_prompt_course_style(custom_options)
@@ -94,6 +106,7 @@ def app():
         if ss.num_lessons == 0:
             display_warning_not_started()
         else:
+            helpful_info.empty() #here don't use ss. Valid.
             col1, col2 = st.columns([0.6,0.4])
             with col2:
                 display_current_status_col2()
@@ -104,9 +117,8 @@ def app():
                     generating_warning = st.empty()
                     generating_warning.caption(
                         '''
-                        :blue[Lesson script generating. Check out below!]👇
-
                         - Please DO NOT touch "**Next learning step ⏩️**" button while generating to avoid failure.
+                        - :blue[Lesson script generating. Check out below!]👇
                         '''
                     )
                     new_lesson = visualize_new_content(
@@ -156,11 +168,10 @@ def app():
         ss.main_page_displayed = False
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()
-            display_current_status()
         elif ss["OPENAI_API_KEY"] != '' and ss.chroma_collection == '':
             display_warning_upload_materials_vdb()
-            display_current_status()
         else:
+            helpful_info.empty()
             ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
             col1, col2 = st.columns([0.6,0.4])
             with col1:
