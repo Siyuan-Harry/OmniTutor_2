@@ -32,9 +32,8 @@ def app():
     
     st.write(ss.main_page_displayed)
 
-    settings = display_main_page(ss.main_page_displayed)
-
     # display main page and initialize settings from it
+    settings = display_main_page(ss.main_page_displayed)
     if settings is not None:
         (
             api_key, 
@@ -48,6 +47,7 @@ def app():
     else:
         api_key = use_35 = added_files = num_lessons = custom_options = Chinese = btn_start = None
 
+    # display chat input box
     user_question = st.chat_input("Enter your questions when learning...")
 
     #displaying current status
@@ -102,11 +102,11 @@ def app():
                     regenerate_outline(ss.course_outline_list)
                     ss.lesson_counter = 1
                     generating_warning = st.empty()
-                    generating_warning.markdown(
+                    generating_warning.caption(
                         '''
-                        课节生成中，你可以点击展开查看👇，但请**不要触碰**侧边栏 `Next learning step ⏩️` 按钮以避免生成失败。
-                        Lesson script generating. Check out below!👇 
-                        Please **DO NOT** touch `Next learning step ⏩️` button to avoid fail in generating.
+                        :blue[Lesson script generating. Check out below!]👇
+
+                        - Please DO NOT touch "**Next learning step ⏩️**" button while generating to avoid failure.
                         '''
                     )
                     new_lesson = visualize_new_content(

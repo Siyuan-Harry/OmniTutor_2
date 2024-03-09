@@ -61,6 +61,7 @@ def initialize_file(added_files):
     #success_outline.empty()
     return temp_file_paths
 
+# 这里以及下面都要改. 前后端分离
 def initialize_vdb(temp_file_paths):
     with st.spinner('Constructing vector database from provided materials...'):
         chroma_collection = constructVDB(temp_file_paths)
@@ -123,7 +124,7 @@ def regenerate_content(course_content_list):
 
 def display_main_page(is_visualized):
     description = """
-            <p style = "color: grey;"> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </p> :100:
+            <p style = "color: grey;"> An all-round teacher. A teaching assistant who really knows the subject. **Anything. Anywhere. All at once.** </p>
             
             Github Repo: https://github.com/Siyuan-Harry/OmniTutor_2
             - Github Repo (for OmniTutor prototype version): https://github.com/Siyuan-Harry/OmniTutor 
