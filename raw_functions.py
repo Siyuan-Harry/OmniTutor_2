@@ -98,9 +98,10 @@ def genarating_outline(client, keywords, num_lessons, language, model):
             Example output format:
             [[name_lesson1, abstract_lesson1],[name_lesson2, abstrct_lesson2]]
             In the example, you can see each element in this list consists of two parts: the "name_lesson" part is the name of the lesson, and the "abstract_lesson" part is the one-sentence description of the lesson, intruduces knowledge it contained. 
-            for each lesson in this course, you should provide these two information and organize them as exemplified.
+            for each lesson in this course, you should provide these two information and organize them as exemplified. 
             for this course, you should design {num_lessons} lessons in total.
             the course outline should be written in {language}.
+            Please output this list straightforward. DO NOT contain anything other than this python list in your answer (such as a markdown format code block syntax). Your answer should only be this list.
             Start the work now.
             """
     messages =  [
