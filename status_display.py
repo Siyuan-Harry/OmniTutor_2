@@ -83,6 +83,7 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
         st.markdown(course_outline_string)
     return course_outline_list
 
+
 def visualize_new_content(client, count_generating_content, lesson_description, chroma_collection, language, style_options, model):
     retrievedChunksList = searchVDB(lesson_description, chroma_collection)
     with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):

@@ -10,29 +10,31 @@ def app():
     with st.sidebar:
         st.title(":grey[OmniTutor 2.0]")
         st.caption('''
-                   An all-round teacher and a personalized teaching assistant who really knows the subject, to help you solve all your learning problems, Make learning so simple: anything, anywhere, all at once.
+                    An all-round teacher and a personalized teaching assistant who really knows the subject, to help you solve all your learning problems, Make learning so simple: anything, anywhere, all at once.
                    ''')
         st.image("https://siyuan-harry.oss-cn-beijing.aliyuncs.com/oss://siyuan-harry/WechatIMG1729.jpg")
-        #visualize_rag
-        btn_next = st.button('Next learning step ⏩️')
+        btn_next = st.button("⏩️ Next learning step")
+        st.caption('''👆 **This button is available after your learning begins.**''')
+
+        st.write(""":grey[👋 Hi, I'm Siyuan! If you encountered any problem playing with OmniTutor or have any suggestions, welcome to contact me at *siyuanfang730@gmail.com*.]""")
     
     st.title("OmniTutor 2.0")
     st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
     st.markdown("""
-        <style>
-            .footer {
-                position: fixed;
-                bottom: 0;
-                right: 10px;
-                width: auto;
-                background-color: transparent;
-                text-align: right;
-                padding-right: 10px;
-                padding-bottom: 10px;
-            }
-        </style>
-        <div class="footer">Made with 🧡 by Siyuan</div>
-    """, unsafe_allow_html=True)
+                <style>
+                    .footer {
+                        position: fixed;
+                        bottom: 0;
+                        right: 10px;
+                        width: auto;
+                        background-color: transparent;
+                        text-align: right;
+                        padding-right: 10px;
+                        padding-bottom: 10px;
+                    }
+                </style>
+                <div class="footer">Made with 🧡 by Siyuan</div>
+                """, unsafe_allow_html=True)
 
     # display main page and initialize settings from it
     settings = display_main_page(ss.main_page_displayed)
