@@ -208,14 +208,3 @@ def add_prompt_course_style(selected_style_list):
                 customize_prompt += '- **Be easier to learn**. So you should use plain language to write the lesson script, and apply some metaphors & analogys wherever appropriate.\n'
     return customize_prompt
 
-def teaching_supervision(outline, student_questions):
-    system_message = 'You are a great AI teacher and teaching supervisor, skilled at giving teacher useful advice based on your insights towards students.'
-    user_message = f"""
-                the teaching outline is {outline}.
-                here are some questions this student is asking the teaching assistant:
-                {student_questions}
-
-                you output should be JSON format. Example output:
-
-            
-                """
