@@ -80,7 +80,7 @@ def app():
             if Chinese:
                 ss.language = "Chinese"
             if use_35:
-                ss["openai_model"] = 'gpt-3.5-turbo'
+                ss["openai_model"] = 'gpt-3.5-turbo-0125'
             ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
 
             col1, col2 = st.columns([0.6,0.4])
@@ -109,8 +109,6 @@ def app():
         else:
             helpful_info.empty() #here don't use ss. Valid.
             col1, col2 = st.columns([0.6,0.4])
-            with col2:
-                display_current_status_col2()
             with col1:
                 if ss.course_content_list == []:
                     regenerate_outline(ss.course_outline_list)
@@ -158,6 +156,8 @@ def app():
                         data=course_md,
                         file_name='OmniTutor_Your_Course.md',
                     )
+            with col2:
+                display_current_status_col2()
 
     # 这绝对是个祸害
     #if visualize_learning:

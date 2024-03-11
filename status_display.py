@@ -22,7 +22,7 @@ def initialize_session_state():
     if "OPENAI_API_KEY" not in ss:
         ss["OPENAI_API_KEY"] = ''
     if "openai_model" not in ss:
-        ss["openai_model"] = 'gpt-4-1106-preview' 
+        ss["openai_model"] = 'gpt-4-turbo-preview' 
     if "client" not in ss:
         ss.client = ''
     if "messages_ui" not in ss:
