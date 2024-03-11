@@ -133,6 +133,7 @@ def app():
                     )
                     ss.course_content_list.append(new_lesson)
                     generating_warning.empty()
+                    
                 elif ss.lesson_counter < ss.num_lessons:
                     regenerate_outline(ss.course_outline_list)
                     regenerate_content(ss.course_content_list)
@@ -141,7 +142,7 @@ def app():
                         ss.client,
                         ss.lesson_counter,
                         ss.course_outline_list[ss.lesson_counter-1],
-                        ss.chroma_collection,
+                        ss.chroma_collection, 
                         ss.language, 
                         ss.style_options, 
                         ss["openai_model"]
