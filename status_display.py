@@ -83,6 +83,7 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
         st.markdown(course_outline_string)
     return course_outline_list
 
+
 def visualize_new_content(client, count_generating_content, lesson_description, chroma_collection, language, style_options, model):
     retrievedChunksList = searchVDB(lesson_description, chroma_collection)
     with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
@@ -252,6 +253,12 @@ def convert_markdown_string(course_outline_list, course_content_list):
         lessons_count += 1
         course_markdown_string += f"# Lesson {lessons_count}\n\n"
         course_markdown_string += f"{content}\n\n"
-
+    
+    course_markdown_string += f"# 🦉 Chat History \n\n"
+    for message in ss.messages_ui:
+        if message["role"] == "user":
+            course_markdown_string += f"- Me: \n\n{message['content']} \n\n"
+        elif message["role"] == "assistant":
+            course_markdown_string += f"- Assistant: \n\n{message['content']} \n\n"
     return course_markdown_string
 

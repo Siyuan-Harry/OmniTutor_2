@@ -10,7 +10,7 @@ from collections import Counter
 #import jieba
 #import jieba.analyse
 import nltk
-
+import json
 
 @st.cache_data
 def download_nltk():
@@ -60,10 +60,11 @@ def get_keywords(file_paths): #这里的可以加一个条件判断，输入语�
 
     return keywords_list
 
-def get_completion_from_messages(client, messages, model, temperature=0):
+def get_json_completion_from_messages(client, messages, model, temperature=0):
     client = client
     completion = client.chat.completions.create(
         model=model,
+        response_format={ "type": "json_object" },
         messages=messages,
         temperature=temperature,
     )
@@ -89,16 +90,16 @@ def get_visualize_stream_completion_from_messages(client, messages, model, tempe
 
 def genarating_outline(client, keywords, num_lessons, language, model):
     system_message = 'You are a great AI teacher and linguist, skilled at create course outline based on summarized knowledge materials.'
+    example_json = """{'outline':[['name_lesson1', 'abstract_lesson1'],['name_lesson2', 'abstract_lesson2']]}"""
     user_message = f"""You are a great AI teacher and linguist,
             skilled at generating course outline based on keywords of the course.
             Based on keywords provided, you should carefully design a course outline. 
             Requirements: Through learning this course, learner should understand those key concepts.
             Key concepts: {keywords}
-            you should output course outline in a python list format, Do not include anything else except that python list in your output.
-            Example output format:
-            [[name_lesson1, abstract_lesson1],[name_lesson2, abstrct_lesson2]]
-            In the example, you can see each element in this list consists of two parts: the "name_lesson" part is the name of the lesson, and the "abstract_lesson" part is the one-sentence description of the lesson, intruduces knowledge it contained. 
-            for each lesson in this course, you should provide these two information and organize them as exemplified.
+            you should output course outline as a JSON object, Do not include anything else except that JSON object in your output.
+            Example output format:{example_json}
+            In the example, you can see each element in this JSON consists of two parts: the "name_lesson" part is the name of the lesson, and the "abstract_lesson" part is the one-sentence description of the lesson, intruduces knowledge it contained. 
+            for each lesson in this course, you should provide these two information and organize them as exemplified. 
             for this course, you should design {num_lessons} lessons in total.
             the course outline should be written in {language}.
             Start the work now.
@@ -110,11 +111,11 @@ def genarating_outline(client, keywords, num_lessons, language, model):
                 'content': user_message},
             ]
 
-    response = get_completion_from_messages(client, messages, model)
+    response = get_json_completion_from_messages(client, messages, model)
 
-    list_response = ['nothing in the answers..']
+    list_response = [['nothing in the answers..','please try again..']]
     try:
-        list_response = eval(response)
+        list_response = json.loads(response)['outline']
     except SyntaxError:
         st.markdown('🤯Oops.. We encountered an error generating the outline of your course. Please try again.')
         pass
@@ -206,3 +207,4 @@ def add_prompt_course_style(selected_style_list):
             elif style == "Easier to learn":
                 customize_prompt += '- **Be easier to learn**. So you should use plain language to write the lesson script, and apply some metaphors & analogys wherever appropriate.\n'
     return customize_prompt
+
