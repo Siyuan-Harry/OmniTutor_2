@@ -68,35 +68,38 @@ def app():
     # must divide btn_start and btn_next
     if btn_start:
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
-            ss.main_page_displayed = False
-            helpful_info.empty()
-            ss.start_learning = 1
-            ss.num_lessons = num_lessons
-            ss.style_options = add_prompt_course_style(custom_options)
-            if ss["OPENAI_API_KEY"] == '':
-                ss["OPENAI_API_KEY"] = api_key
-            if Chinese:
-                ss.language = "Chinese"
-            if use_35:
-                ss["openai_model"] = 'gpt-3.5-turbo-0125'
-            ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
+            if ss.start_learning == 0:
+                ss.main_page_displayed = False
+                helpful_info.empty()
+                ss.start_learning = 1
+                ss.num_lessons = num_lessons
+                ss.style_options = add_prompt_course_style(custom_options)
+                if ss["OPENAI_API_KEY"] == '':
+                    ss["OPENAI_API_KEY"] = api_key
+                if Chinese:
+                    ss.language = "Chinese"
+                if use_35:
+                    ss["openai_model"] = 'gpt-3.5-turbo-0125'
+                ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
 
-            learning_page.empty()
-            with learning_page.container():
-                st.success("✅ API Key stored successfully!")
-                col1, col2 = st.columns([0.6,0.4])
-                with col1:
-                    ss.temp_file_paths = initialize_file(added_files)
-                    ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
-                    ss.course_outline_list = initialize_outline(
-                        ss.client, 
-                        ss.temp_file_paths, 
-                        num_lessons, 
-                        ss.language, 
-                        ss["openai_model"]
-                    )
-                with col2:
-                    display_current_status_col2()
+                learning_page.empty()
+                with learning_page.container():
+                    st.success("✅ API Key stored successfully!")
+                    col1, col2 = st.columns([0.6,0.4])
+                    with col1:
+                        ss.temp_file_paths = initialize_file(added_files)
+                        ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
+                        ss.course_outline_list = initialize_outline(
+                            ss.client, 
+                            ss.temp_file_paths, 
+                            num_lessons, 
+                            ss.language, 
+                            ss["openai_model"]
+                        )
+                    with col2:
+                        display_current_status_col2()
+            elif ss.start_learning == 1:
+                display_warning_started()
         elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
             # here, need to clear the screen
             display_warning_api_key()

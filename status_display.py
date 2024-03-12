@@ -134,10 +134,10 @@ def display_main_page(is_visualized):
 
             ### ✨ Key features                                           
                                                     
-            - 🧑‍🏫 **Concise and clear course creation**: <font color = 'grey'>Generated from your learning notes (**.md**) or any learning materials (**.pdf**)!</font>
+            - 🧑‍🏫 **Customized course creation**: <font color = 'grey'>Generated from any learning materials (**.md or .pdf**)!</font>
             - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
-            - ⚙️ **Customize your own course**: <font color = 'grey'>Choose your preferred teaching style, lesson count and language.</font>
             - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
+            - 🔮 **You learn, OmniTutor learns too**: <font color = 'grey'>A multi-agent system (teacher, TA, and a teaching supervisor) is desgined to learn your status and habits.</font>
             """
     description_2 = """
     ### 🏃‍♂️ Get started!
@@ -218,9 +218,15 @@ def display_current_status():
 
 def display_warning_not_started():
     warning_not_started = st.empty()
-    warning_not_started.warning("The learning haven't stated yet, please start to learn first!", icon="⚠️")
+    warning_not_started.warning("The learning haven't started yet, please start to learn first!", icon="⚠️")
     time.sleep(2)
     warning_not_started.empty()
+
+def display_warning_started():
+    general_warning = st.empty()
+    general_warning.markdown("The learning has already started, please touch 'Next lesson' button!", icon="⚠️")
+    time.sleep(2)
+    general_warning.empty()
 
 def display_warning_api_key():
     warning_api_key = st.empty()
