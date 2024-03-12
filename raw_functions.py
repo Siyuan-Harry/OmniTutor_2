@@ -266,5 +266,7 @@ def decorate_suggested_questions(question_list):
     3. {question_list[2]}
 
     If needed, simply copying them to your input box and ask me 😊
+
+    😉 By the way, the supervisor observed your learning and adjusted the way to write lesson script. The next lesson will be more suitable for you to study.
     """
     return decorated_suggest_question
