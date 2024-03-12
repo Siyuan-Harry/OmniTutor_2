@@ -71,6 +71,7 @@ Before running , ensure you have the following prerequisites installed:
 - [x] Ask questions as you learn
 - [x] Add **session management system** for robustness
 - [x] **Update the session management system** to prevent the visual course content from disappearing in some cases
+- [x] **Adopt multi-agent system** (teacher, TA, and a teaching supervisor) to learn the learner's habits.
 - [ ] **visualize chunks and RAG system** to enhance learners' trust and sense of control over the generated lessons
 - [ ] Make the generated course outline **editable**
 

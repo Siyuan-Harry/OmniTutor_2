@@ -151,7 +151,7 @@ def searchVDB(query, chroma_collection):
         
     return retrieved_chunks_list
 
-def write_one_lesson(client, topic, materials, language, style_options, model):
+def write_one_lesson(client, topic, materials, language, style_options, ts_suggestion, model):
     system_message = 'You are a great AI teacher and linguist, skilled at writing informative and easy-to-understand course script based on given lesson topic and knowledge materials.'
 
     user_message = f"""You are a great AI teacher and linguist,
@@ -169,6 +169,7 @@ def write_one_lesson(client, topic, materials, language, style_options, model):
             knowledge materials related to this lesson：【{materials} 】 \n
             the script should be witten in {language}, and mathematical symbols should be written in markdown form. \n
             {style_options} \n
+            {ts_suggestion} \n
             Start writting the script of this lesson now.
             """
     
@@ -208,15 +209,64 @@ def add_prompt_course_style(selected_style_list):
                 customize_prompt += '- **Be easier to learn**. So you should use plain language to write the lesson script, and apply some metaphors & analogys wherever appropriate.\n'
     return customize_prompt
 
-def teaching_supervision(outline, student_questions):
+def teaching_supervision(outline, student_questions, client, model):
     system_message = 'You are a great AI teacher and teaching supervisor, skilled at giving teacher useful advice based on your insights towards students.'
-    example_output = """{'level':"new hand", }"""
+    example_output = """{
+                            'student_level': 'beginner', 
+                            'student_interested': 'basic concepts',
+                            'suggest_question': [
+                                'Question_1',
+                                'Question_2',
+                                'Question_3'
+                            ],
+                            'script_revise_suggestions': 'please include more concrete examples in the lesson script.'
+                        }"""
     user_message = f"""
-                the teaching outline is {outline}.
-                here are some questions this student is asking the teaching assistant:
-                {student_questions}
+                There's a student currently learning a course produced by your collegue and chatting with a teaching assistant.
+                The teaching outline of the course is in the  {outline}. 
+                During learning process, here are some questions this student asked the teaching assistant:
+                student questions: 「{student_questions}」
 
-                your output should be a JSON object. Example output:
+                Please use your professional knowledge to recognize the learning status of the student and give support to student and teacher. 
+                Please output your suggestions as a JSON object. Example output:
                 {example_output}
 
+                The four main keys in this JSON object are:
+                1. "student_level": Determine the student's level of understanding of the course. Including three stages: "beginner", "intermediate" and "advanced".
+                2. "student_interested": Determine which parts of the course student is more interested in. Including "basic concepts", "specific information in the material", "the whole idea of the material" and "professional topics that interest the student". Generally, beginners are interested in basic concepts and concrete info, while internediate and advanced learners are more likely to focus on the whole idea of the material or the professional topics suites their interests.
+                3. "suggest_question": Recommend 3 questions based on student's preferences. If student is interested in basic concepts, recommend more explanations of basic concepts; If student is interested in their own professional topics, please recommend the extension of professional topics. Please install the three recommended questions in the json array. ⚠️ DO NOT repeat questions that students have already asked.
+                4. "script_revise_suggestions": Please evaluate the amount of information in the lesson script, and how well it matches the preferences of the students, then give suggestions for revising the lesson script to make it more suited to student's preference.
+
+                DO NOT include anything other than this JSON object in your output, and strictly follow the format of the output, especially the key names.
                 """
+    messages =  [
+                    {'role':'system',
+                    'content': system_message},
+                    {'role':'user',
+                    'content': user_message},
+                ]
+    
+    response = get_json_completion_from_messages(client, messages, model)
+    dict_response = json.loads(response)
+    return dict_response
+
+def add_prompt_ts_suggestions(student_level, student_interested, script_revise_suggestions):
+    teaching_supervisor_suggestion = f""" 
+        The current student you're teaching is in {student_level} level, and he/she is interested in {student_interested}. 
+        Therefore I suggest "{script_revise_suggestions}".
+    """
+    return teaching_supervisor_suggestion
+
+def decorate_suggested_questions(question_list):
+    decorated_suggest_question = f"""
+    The following questions are recommended for you according to your learning status:
+
+    1. {question_list[0]}
+    2. {question_list[1]}
+    3. {question_list[2]}
+
+    If needed, simply copying them to your input box and ask me 😊
+
+    😉 By the way, the supervisor observed your learning and adjusted the way to write lesson script. The next lesson will be more suitable for you to study.
+    """
+    return decorated_suggest_question
