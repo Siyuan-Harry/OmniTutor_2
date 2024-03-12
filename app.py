@@ -8,7 +8,7 @@ def app():
 
     # unchangable layout
     with st.sidebar:
-        st.title(":grey[OmniTutor 2.0]")
+        st.title(":grey[OmniTutor 2.0 Beta]")
         st.caption('''
                     An all-round teacher and a personalized teaching assistant who really knows the subject, to help you solve all your learning problems, Make learning so simple: anything, anywhere, all at once.
                    ''')
@@ -18,7 +18,7 @@ def app():
 
         st.write(""":grey[👋 Hi, I'm Siyuan! If you encountered any problem playing with OmniTutor or have any suggestions, welcome to contact me at *siyuanfang730@gmail.com*.]""")
     
-    st.title("OmniTutor 2.0")
+    st.title("OmniTutor")
     st.subheader("Your personalized :blue[AI Knowledge Engine] 🦉")
     st.markdown("""
                 <style>
