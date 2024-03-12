@@ -29,6 +29,8 @@ def initialize_session_state():
         ss.messages_ui = []
     if "messages" not in ss:
         ss.messages = []
+    if "user_message_count" not in ss:
+        ss.user_message_count = 0
 
     if "num_lessons" not in ss:
         ss.num_lessons = 0
@@ -36,6 +38,8 @@ def initialize_session_state():
         ss.language = ''
     if "style_options" not in ss:
         ss.style_options = ''
+    if "ts_suggestions" not in ss:
+        ss.ts_suggestions = ''
 
     if "start_learning" not in ss:
         ss.start_learning = 0
@@ -84,7 +88,7 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
     return course_outline_list
 
 
-def visualize_new_content(client, count_generating_content, lesson_description, chroma_collection, language, style_options, model):
+def visualize_new_content(client, count_generating_content, lesson_description, chroma_collection, language, style_options, ts_suggestions, model):
     retrievedChunksList = searchVDB(lesson_description, chroma_collection)
     with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
         courseContent = write_one_lesson(
@@ -93,6 +97,7 @@ def visualize_new_content(client, count_generating_content, lesson_description, 
             retrievedChunksList, 
             language, 
             style_options, 
+            ts_suggestions,
             model
         )
     return courseContent
