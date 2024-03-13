@@ -257,16 +257,29 @@ def add_prompt_ts_suggestions(student_level, student_interested, script_revise_s
     """
     return teaching_supervisor_suggestion
 
-def decorate_suggested_questions(question_list):
-    decorated_suggest_question = f"""
-    The following questions are recommended for you according to your learning status:
+def decorate_suggested_questions(language, question_list):
+    if language == 'Chinese':
+        decorated_suggest_question = f"""
+        根据您的学习状况，以下是为您推荐的问题:
 
-    1. {question_list[0]}
-    2. {question_list[1]}
-    3. {question_list[2]}
+        1. {question_list[0]}
+        2. {question_list[1]}
+        3. {question_list[2]}
 
-    If needed, simply copying them to your input box and ask me 😊
+        如果您需要，只需将它们复制到输入框中并询问我就好啦😊
 
-    😉 By the way, the supervisor observed your learning and adjusted the way to write lesson script. The next lesson will be more suitable for you to study.
-    """
+        😉对了，根据对您学习状况的观察，OmniTutor调整了课堂脚本的写作方式。下一节课将更适合你学习。快试试吧~
+        """
+    elif language == 'English':
+        decorated_suggest_question = f"""
+        The following are recommended questions for you according to your learning status:
+
+        1. {question_list[0]}
+        2. {question_list[1]}
+        3. {question_list[2]}
+
+        If needed, simply copying them to your input box and ask me 😊
+
+        😉 By the way, OmniTutor observed your learning and adjusted the way to write lesson script. The next lesson will be more suitable for you to study.
+        """
     return decorated_suggest_question
