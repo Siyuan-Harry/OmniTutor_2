@@ -17,11 +17,10 @@
 
 ## Features
 
-- 🧑‍🏫 **Concise and clear course creation**: Generated from any learning materials (.md or .pdf)!
-- 💡 **Removal of AI illusion**: visualization and controllability of knowledge processing process at every step.
-- 📚 **All disciplines**: Whether it's math, physics, literature, history or coding, OmniTutor covers it all.
-- ⚙️ **Customize your own course**: Choose preferred teaching style, lesson count and language.
-- ⚡️ **Fast respond with trustable accuracy**: ask the AI teaching assistant who really understand the materials.
+- 🧑‍🏫 **Customized course creation**: Generated from any learning materials (**.md or .pdf**)!
+- 📚 **All disciplines**: Whether it's math, physics, literature, history or coding, OmniTutor covers it all.
+- ⚡️ **Fast respond with trustable accuracy**: Problem-solving chat with the AI teaching assistant who really understand the materials.
+- 🔮 **You learn, OmniTutor learns too**: A multi-agent system (teacher, TA, and a teaching supervisor) is desgined to learn your status and habits.
 
 OmniTutor - An all-round teacher and a personalized teaching assistant who really knows the subject, to help you solve all your learning problems, Make learning so simple: anything, anywhere, all at once.
 
