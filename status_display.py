@@ -34,6 +34,8 @@ def initialize_session_state():
 
     if "num_lessons" not in ss:
         ss.num_lessons = 0
+    if "learning_intention" not in ss:
+        ss.learning_intention = ''
     if "language" not in ss:
         ss.language = ''
     if "style_options" not in ss:
@@ -74,10 +76,10 @@ def initialize_vdb(temp_file_paths):
     st.success("Constructing vector database from provided materials...Done")
     return chroma_collection
 
-def initialize_outline(client, temp_file_paths, num_lessons, language, model):
+def initialize_outline(client, temp_file_paths, learning_intention, num_lessons, language, model):
     with st.spinner('Generating Course Outline...'):
         summarized_materials = get_keywords(temp_file_paths)
-        course_outline_list = genarating_outline(client, summarized_materials, num_lessons, language, model)
+        course_outline_list = genarating_outline(client, summarized_materials, learning_intention, num_lessons, language, model)
     st.success("Generating Course Outline...Done")
     course_outline_string = ''
     lessons_count = 0
@@ -165,7 +167,7 @@ def display_main_page(is_visualized):
     """
 
     description_3 = """
-    2. **Customize your learning journey**: <font color = 'grey'>Tell OmniTutor your preferred teaching style, lesson count and language.</font>
+    2. **Customize your learning journey**: <font color = 'grey'>Tell OmniTutor your preferred teaching style, topic, lesson count and language. All of these are optional.</font>
     """
 
     description_4 = """
@@ -190,12 +192,14 @@ def display_main_page(is_visualized):
                     ['More examples', 'More excercises', 'Easier to learn'],
                     max_selections = 2
                 )
+                learner_input = st.text_input('(Optional) Please enter what you want to learn 👇, you can enter keywords or phrases, and this may help OmniTutor create better lessons for you :)', 
+                                              placeholder = 'Use comma "," to split the different keywords/phrases.')
                 ss.language = 'English'
                 Chinese = st.checkbox('Output in Chinese')
             
             st.markdown(description_4, unsafe_allow_html=True)
             btn_start = st.button('🔮 Start Learning')
-        return api_key, use_35, added_files, num_lessons, custom_options, Chinese, btn_start
+        return api_key, use_35, added_files, num_lessons, custom_options, learner_input, Chinese, btn_start
     else:
         main_page.empty()
         return None

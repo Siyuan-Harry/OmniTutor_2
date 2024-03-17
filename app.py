@@ -45,11 +45,12 @@ def app():
             added_files, 
             num_lessons, 
             custom_options, 
+            learning_intention,
             Chinese, 
             btn_start
         ) = settings
     else:
-        api_key = use_35 = added_files = num_lessons = custom_options = Chinese = btn_start = None
+        api_key = use_35 = added_files = num_lessons = custom_options = learning_intention = Chinese = btn_start = None
     
     # If user encounter a blank screen, this will be the only info left on the main page.
     helpful_info = st.empty()
@@ -77,6 +78,8 @@ def app():
                 ss.style_options = add_prompt_course_style(custom_options)
                 if ss["OPENAI_API_KEY"] == '':
                     ss["OPENAI_API_KEY"] = api_key
+                if learning_intention:
+                    ss.learning_intention = learning_intention
                 if Chinese:
                     ss.language = "Chinese"
                 if use_35:
@@ -91,6 +94,7 @@ def app():
                     ss.course_outline_list = initialize_outline(
                         ss.client, 
                         ss.temp_file_paths, 
+                        ss.learning_intention,
                         num_lessons, 
                         ss.language, 
                         ss["openai_model"]

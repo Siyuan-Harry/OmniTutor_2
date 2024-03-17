@@ -88,7 +88,7 @@ def get_visualize_stream_completion_from_messages(client, messages, model, tempe
     message_placeholder.markdown(full_response)
     return full_response
 
-def genarating_outline(client, keywords, num_lessons, language, model):
+def genarating_outline(client, keywords, learning_intention, num_lessons, language, model):
     system_message = 'You are a great AI teacher and linguist, skilled at create course outline based on summarized knowledge materials.'
     example_json = """{'outline':[['name_lesson1', 'abstract_lesson1'],['name_lesson2', 'abstract_lesson2']]}"""
     user_message = f"""You are a great AI teacher and linguist,
@@ -96,6 +96,8 @@ def genarating_outline(client, keywords, num_lessons, language, model):
             Based on keywords provided, you should carefully design a course outline. 
             Requirements: Through learning this course, learner should understand those key concepts.
             Key concepts: {keywords}
+            Your student want to learn these topics, these are very important information for you: {learning_intention}
+
             you should output course outline as a JSON object, Do not include anything else except that JSON object in your output.
             Example output format:{example_json}
             In the example, you can see each element in this JSON consists of two parts: the "name_lesson" part is the name of the lesson, and the "abstract_lesson" part is the one-sentence description of the lesson, intruduces knowledge it contained. 
