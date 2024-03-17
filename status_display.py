@@ -45,6 +45,8 @@ def initialize_session_state():
         ss.start_learning = 0
     if "main_page_displayed" not in ss:
         ss.main_page_displayed = True
+    if "chatInput_displayed" not in ss:
+        ss.chatInput_displayed = False
 
 def initialize_file(added_files):
     temp_file_paths = []
@@ -116,7 +118,7 @@ def visualize_new_content(client, count_generating_content, lesson_description, 
             ts_suggestions,
             model
         )
-        ss.messages_ui.append({"role": "assistant", "content": decorate_suggested_questions_assistant(ss.language, list_augmentedQueries)})
+        ss.messages_ui.append({"role": "assistant", "content": decorate_suggested_questions_assistant(count_generating_content, ss.language, list_augmentedQueries)})
     return courseContent
 
 def regenerate_outline(course_outline_list):
@@ -197,6 +199,16 @@ def display_main_page(is_visualized):
     else:
         main_page.empty()
         return None
+
+def display_chatInput_box(is_visualized):
+    user_question = st.empty()
+    if is_visualized:
+        user_question = user_question.chat_input("Enter your questions when learning...")
+    else:
+        user_question.empty()
+
+    return user_question
+
 
 def display_current_status_col1():
     if ss.course_outline_list == []:

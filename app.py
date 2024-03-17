@@ -60,7 +60,7 @@ def app():
                ''')
 
     # display chat input box
-    user_question = st.chat_input("Enter your questions when learning...")
+    user_question = display_chatInput_box(ss.chatInput_displayed)
 
     # Create learning page object
     learning_page = st.empty()
@@ -70,6 +70,7 @@ def app():
         if api_key !="" and api_key.startswith("sk-") and len(api_key) == 51 and added_files:
             if ss.start_learning == 0:
                 ss.main_page_displayed = False
+                ss.chatInput_displayed = True
                 helpful_info.empty()
                 ss.start_learning = 1
                 ss.num_lessons = num_lessons
@@ -85,19 +86,20 @@ def app():
                 learning_page.empty()
                 with learning_page.container():
                     st.success("✅ API Key stored successfully!")
-                    col1, col2 = st.columns([0.6,0.4])
-                    with col1:
-                        ss.temp_file_paths = initialize_file(added_files)
-                        ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
-                        ss.course_outline_list = initialize_outline(
-                            ss.client, 
-                            ss.temp_file_paths, 
-                            num_lessons, 
-                            ss.language, 
-                            ss["openai_model"]
-                        )
-                    with col2:
-                        display_current_status_col2()
+                    ss.temp_file_paths = initialize_file(added_files)
+                    ss.chroma_collection = initialize_vdb(ss.temp_file_paths)
+                    ss.course_outline_list = initialize_outline(
+                        ss.client, 
+                        ss.temp_file_paths, 
+                        num_lessons, 
+                        ss.language, 
+                        ss["openai_model"]
+                    )
+                    st.caption('''
+                        :blue[**Now, please touch "Next lesson" button in the sidebar**]: 
+                        - This will bring you to the classroom OmniTutor created for you. 
+                    ''')
+                    
             elif ss.start_learning == 1:
                 display_warning_started()
         elif len(ss["OPENAI_API_KEY"]) != 51 and added_files:
@@ -122,7 +124,7 @@ def app():
                         generating_warning = st.empty()
                         generating_warning.caption(
                             '''
-                            - Please DO NOT touch "**Next learning step ⏩️**" button while generating to avoid failure.
+                            - Please DO NOT touch "**Next lesson**" button while generating to avoid failure.
                             - :blue[Lesson script generating. Check out below!]👇
                             '''
                         )
@@ -174,7 +176,7 @@ def app():
     #    else:
     #        display_current_status() #如果重复勾选，会导致重复显示课程内容
 
-    if user_question:
+    if ss.chatInput_displayed and type(user_question) == str: # type check is to ensure the first 
         ss.main_page_displayed = False
         if len(ss["OPENAI_API_KEY"]) != 51:
             display_warning_api_key()

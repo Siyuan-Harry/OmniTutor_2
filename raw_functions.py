@@ -250,7 +250,7 @@ def teaching_supervision(outline, student_questions, client, model):
                         }"""
     user_message = f"""
                 There's a student currently learning a course produced by your collegue and chatting with a teaching assistant.
-                The teaching outline of the course is in the  {outline}. 
+                The teaching outline of the course is in the {outline}. 
                 During learning process, here are some questions this student asked the teaching assistant:
                 student questions: 「{student_questions}」
 
@@ -311,10 +311,10 @@ def decorate_suggested_questions_supervisor(language, question_list):
         """
     return decorated_suggest_question
 
-def decorate_suggested_questions_assistant(language, question_list):
+def decorate_suggested_questions_assistant(lesson_count, language, question_list):
     if language == 'Chinese':
         decorated_suggest_question = f"""
-        根据老师这节课的内容，以下是为您推荐的问题:
+        根据第{lesson_count}节课的内容，以下是为您推荐的问题:
 
         1. {question_list[0]}
         2. {question_list[1]}
@@ -324,9 +324,8 @@ def decorate_suggested_questions_assistant(language, question_list):
         如果您需要，只需将它们复制到输入框中并询问我就好啦😊 如果对上述问题不感兴趣，您也可以问我任何您学习中的其它问题。
         """
     elif language == 'English':
-
         decorated_suggest_question = f"""
-        According to this lesson, the following are recommended questions for you:
+        According to lesson {lesson_count}, the following are recommended questions for you:
 
         1. {question_list[0]}
         2. {question_list[1]}
