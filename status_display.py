@@ -87,19 +87,36 @@ def initialize_outline(client, temp_file_paths, num_lessons, language, model):
         st.markdown(course_outline_string)
     return course_outline_list
 
-
 def visualize_new_content(client, count_generating_content, lesson_description, chroma_collection, language, style_options, ts_suggestions, model):
-    retrievedChunksList = searchVDB(lesson_description, chroma_collection)
     with st.expander(f"Learn the lesson {count_generating_content} ", expanded=False):
+        with st.spinner(text = "Extending the course outline to enhance the course content retrieval..."):
+            dict_augmentedQueries = augment_multiple_query(ss.client, lesson_description)
+            
+            list_augmentedQueries = dict_augmentedQueries['suggested_questions']     
+            
+            queries = [lesson_description] + list_augmentedQueries
+
+        st.success('Extending the course outline to enhance the course content retrieval...Done!')
+
+        retrievedChunksList = searchVDB(queries, chroma_collection)
+        
+        # Deduplicate the retrieved documents 去重，这一步很关键
+        unique_documents = set()
+        for documents in retrievedChunksList:
+            for document in documents:
+                unique_documents.add(document)
+
+        # Generate course content and visualize it.
         courseContent = write_one_lesson(
             client, 
             lesson_description, 
-            retrievedChunksList, 
+            list(unique_documents), 
             language, 
             style_options, 
             ts_suggestions,
             model
         )
+        ss.messages_ui.append({"role": "assistant", "content": decorate_suggested_questions_assistant(ss.language, list_augmentedQueries)})
     return courseContent
 
 def regenerate_outline(course_outline_list):

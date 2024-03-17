@@ -79,7 +79,7 @@ def app():
                 if Chinese:
                     ss.language = "Chinese"
                 if use_35:
-                    ss["openai_model"] = 'gpt-3.5-turbo-0125'
+                    ss["openai_model"] = 'gpt-3.5-turbo'
                 ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
 
                 learning_page.empty()
@@ -115,8 +115,6 @@ def app():
             learning_page.empty()
             with learning_page.container():
                 col1, col2 = st.columns([0.6,0.4])
-                with col2:
-                    display_current_status_col2()
                 with col1:
                     if ss.course_content_list == []:
                         regenerate_outline(ss.course_outline_list)
@@ -166,6 +164,8 @@ def app():
                             data=course_md,
                             file_name='OmniTutor_Your_Course.md',
                         )
+                with col2:
+                    display_current_status_col2()
 
     # 这绝对是个祸害
     #if visualize_learning:
@@ -206,7 +206,7 @@ def app():
                     with st.chat_message("user"):
                         st.markdown(user_question)
 
-                    retrieved_chunks_for_user = searchVDB(user_question, ss.chroma_collection)
+                    retrieved_chunks_for_user = searchVDB(user_question, ss.chroma_collection)[0]
                     prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
                     ss.messages.append({"role": "user", "content": prompt})
 
@@ -244,7 +244,7 @@ def app():
             with col1:
                 display_current_status_col1()
             with col2:
-                ss.messages_ui.append({"role": "assistant", "content": decorate_suggested_questions(supervisor_suggestion['suggest_question'])})
+                ss.messages_ui.append({"role": "assistant", "content": decorate_suggested_questions_supervisor(ss.language, supervisor_suggestion['suggest_question'])})
                 display_current_status_col2()
 
 if __name__ == "__main__":

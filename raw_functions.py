@@ -56,7 +56,7 @@ def get_keywords(file_paths): #这里的可以加一个条件判断，输入语�
             str_keywords = ''
             for word in new_keywords:
                 str_keywords += word + ", "
-            keywords_list.append(f"Top20 frequency keywords for {file_path}: {str_keywords}")
+            keywords_list.append(f"Top20 frequency keywords from learning materials: {str_keywords}")
 
     return keywords_list
 
@@ -66,7 +66,7 @@ def get_json_completion_from_messages(client, messages, model, temperature=0):
         model=model,
         response_format={ "type": "json_object" },
         messages=messages,
-        temperature=temperature,
+        temperature=temperature
     )
     return completion.choices[0].message.content
 
@@ -104,7 +104,7 @@ def genarating_outline(client, keywords, num_lessons, language, model):
             the course outline should be written in {language}.
             Start the work now.
             """
-    messages =  [
+    messages = [
                 {'role':'system',
                 'content': system_message},
                 {'role':'user',
@@ -144,12 +144,40 @@ def constructVDB(file_paths, collection_name='user_upload', embedding_function=S
 def searchVDB(query, chroma_collection):
     try:
         results = chroma_collection.query(query_texts=query, n_results=5, include=['documents', 'embeddings'])
-        retrieved_chunks_list = results['documents'][0]
+        retrieved_chunks_list = results['documents'] #remember to add [0] for its returned value
 
     except Exception:
         retrieved_chunks_list = []
         
     return retrieved_chunks_list
+
+def augment_multiple_query(client, query, model="gpt-3.5-turbo"):
+    example_json = """{
+        'suggested_questions':[
+            'Question_1',
+            'Question_2',
+            'Question_3',
+            'Question_4',
+            'Question_5',
+        ]
+    }
+    """
+    messages = [
+        {
+            "role": "system",
+            "content": f"""You are a helpful expert research assistant. Your users are asking questions about an learning material. 
+            Suggest up to five additional related questions to help them find the information they need, for the provided question. 
+            Suggest only short questions without compound sentences. Suggest a variety of questions that cover different aspects of the topic. 
+            Make sure they are complete questions, and that they are related to the original question. 
+            Output in a JSON array like this: {example_json}. """
+        },
+        {"role": "user", "content": f"""{query}"""}
+    ]
+
+    response = get_json_completion_from_messages(client, messages, model)
+    dict_response = json.loads(response)
+    return dict_response
+
 
 def write_one_lesson(client, topic, materials, language, style_options, ts_suggestion, model):
     system_message = 'You are a great AI teacher and linguist, skilled at writing informative and easy-to-understand course script based on given lesson topic and knowledge materials.'
@@ -193,7 +221,6 @@ def decorate_user_question(user_question, retrieved_chunks_for_user):
     Now you're talking to the student. Please answer.
     '''
     return decorated_prompt
-
 
 def add_prompt_course_style(selected_style_list):
     initiate_prompt = 'Please be siginificantly aware that this course is requested to: \n'
@@ -257,10 +284,10 @@ def add_prompt_ts_suggestions(student_level, student_interested, script_revise_s
     """
     return teaching_supervisor_suggestion
 
-def decorate_suggested_questions(language, question_list):
+def decorate_suggested_questions_supervisor(language, question_list):
     if language == 'Chinese':
         decorated_suggest_question = f"""
-        根据您的学习状况，以下是为您推荐的问题:
+        OmniTutor观察了您的学习状况，以下是为您推荐的问题:
 
         1. {question_list[0]}
         2. {question_list[1]}
@@ -272,7 +299,7 @@ def decorate_suggested_questions(language, question_list):
         """
     elif language == 'English':
         decorated_suggest_question = f"""
-        The following are recommended questions for you according to your learning status:
+        We care about your learning. The following are recommended questions for you according to your learning status:
 
         1. {question_list[0]}
         2. {question_list[1]}
@@ -281,5 +308,30 @@ def decorate_suggested_questions(language, question_list):
         If needed, simply copying them to your input box and ask me 😊
 
         😉 By the way, OmniTutor observed your learning and adjusted the way to write lesson script. The next lesson will be more suitable for you to study.
+        """
+    return decorated_suggest_question
+
+def decorate_suggested_questions_assistant(language, question_list):
+    if language == 'Chinese':
+        decorated_suggest_question = f"""
+        根据老师这节课的内容，以下是为您推荐的问题:
+
+        1. {question_list[0]}
+        2. {question_list[1]}
+        3. {question_list[2]}
+
+
+        如果您需要，只需将它们复制到输入框中并询问我就好啦😊 如果对上述问题不感兴趣，您也可以问我任何您学习中的其它问题。
+        """
+    elif language == 'English':
+
+        decorated_suggest_question = f"""
+        According to this lesson, the following are recommended questions for you:
+
+        1. {question_list[0]}
+        2. {question_list[1]}
+        3. {question_list[2]}
+
+        If needed, simply copying them to your input box and ask me 😊 Or you can ask me whatever problems you're encountering.
         """
     return decorated_suggest_question
