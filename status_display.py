@@ -157,7 +157,7 @@ def display_main_page(is_visualized):
                                                     
             - 🧑‍🏫 **Customized course creation**: <font color = 'grey'>Generated from any learning materials (**.md or .pdf**)!</font>
             - 📚 **All disciplines**: <font color = 'grey'>Whether it's math, physics, literature, history or coding, OmniTutor covers it all.</font>
-            - ⚡️ **Fast respond with trustable accuracy**: <font color = 'grey'>Problem-solving chat with the AI teaching assistant who really understand the materials.</font>
+            - ⚡️ **Turn any learning into a problem-solving game**: <font color = 'grey'>Based on the materials provided, OmniTutor continuously inspire you to dive deeper.</font>
             - 🔮 **You learn, OmniTutor learns too**: <font color = 'grey'>A multi-agent system (teacher, TA, and a teaching supervisor) is desgined to learn your status and habits.</font>
             """
     description_2 = """
