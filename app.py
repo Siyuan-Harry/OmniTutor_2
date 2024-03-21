@@ -182,53 +182,48 @@ def app():
 
     if ss.chatInput_displayed and type(user_question) == str: # type check is to ensure the first 
         ss.main_page_displayed = False
-        if len(ss["OPENAI_API_KEY"]) != 51:
-            display_warning_api_key()
-        elif ss["OPENAI_API_KEY"] != '' and ss.chroma_collection == '':
-            display_warning_upload_materials_vdb()
-        else:
-            helpful_info.empty()
-            ss.user_message_count += 1
-            ss.client = OpenAI(api_key = ss["OPENAI_API_KEY"])
-            learning_page.empty()
-            with learning_page.container():
-                col1, col2 = st.columns([0.6,0.4])
-                with col1:
-                    display_current_status_col1()
-                with col2:
-                    st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
+        helpful_info.empty()
 
-                    with st.chat_message("assistant"):
-                        st.markdown("Hello👋, how can I help you today? 😄")
+        ss.user_message_count += 1
+        learning_page.empty()
+        with learning_page.container():
+            col1, col2 = st.columns([0.6,0.4])
+            with col1:
+                display_current_status_col1()
+            with col2:
+                st.caption(''':blue[AI Assistant]: Ask this TA any questions related to this course and get direct answers. :sunglasses:''')
 
-                    # Display chat messages from history on app rerun
-                    for message in ss.messages_ui:
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-                    
-                    #更新ui上显示的聊天记录
-                    ss.messages_ui.append({"role": "user", "content": user_question})
-                    # Display new user question.
-                    with st.chat_message("user"):
-                        st.markdown(user_question)
+                with st.chat_message("assistant"):
+                    st.markdown("Hello👋, how can I help you today? 😄")
 
-                    retrieved_chunks_for_user = searchVDB(user_question, ss.chroma_collection)[0]
-                    prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
-                    ss.messages.append({"role": "user", "content": prompt})
+                # Display chat messages from history on app rerun
+                for message in ss.messages_ui:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+                
+                #更新ui上显示的聊天记录
+                ss.messages_ui.append({"role": "user", "content": user_question})
+                # Display new user question.
+                with st.chat_message("user"):
+                    st.markdown(user_question)
 
-                    # Display assistant response in chat message container
-                    with st.chat_message("assistant"):
-                        full_response = get_visualize_stream_completion_from_messages(
-                            ss.client,
-                            messages=[
-                                {"role": m["role"], "content": m["content"]}
-                                for m in st.session_state.messages #用chatbot那边的隐藏消息记录
-                            ],
-                            model=ss["openai_model"]
-                        )
-                    ss.messages.append({"role": "assistant", "content": full_response})
-                    ss.messages_ui.append({"role": "assistant", "content": full_response})
-    
+                retrieved_chunks_for_user = searchVDB(user_question, ss.chroma_collection)[0]
+                prompt = decorate_user_question(user_question, retrieved_chunks_for_user)
+                ss.messages.append({"role": "user", "content": prompt})
+
+                # Display assistant response in chat message container
+                with st.chat_message("assistant"):
+                    full_response = get_visualize_stream_completion_from_messages(
+                        ss.client,
+                        messages=[
+                            {"role": m["role"], "content": m["content"]}
+                            for m in st.session_state.messages #用chatbot那边的隐藏消息记录
+                        ],
+                        model=ss["openai_model"]
+                    )
+                ss.messages.append({"role": "assistant", "content": full_response})
+                ss.messages_ui.append({"role": "assistant", "content": full_response})
+
     if (ss.user_message_count >= 2) and (ss.user_message_count % 2 == 0) and (ss.messages_ui[-2]["role"] == "user"): # this last expression is significant
         supervisor_suggestion = teaching_supervision(
             ss.course_outline_list,
