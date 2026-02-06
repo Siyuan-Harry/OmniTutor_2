@@ -2,7 +2,7 @@
 
 ## Your personalized AI Knowledge Engine 🦉
 
-![](pic2.jpg)
+![](pics/pic2.jpg)
 
 ## app links: 
 
@@ -26,11 +26,31 @@ OmniTutor - An all-round teacher and a personalized teaching assistant who reall
 
 ## How to Use
 
+![](pics/pic1.jpg)
+
 1. **Start the Application**: Execute the script to initiate the OmniTutor interface.
 2. **Upload learning materials**: The upload widget in the sidebar supports PDF and .md files simutaenously.
 3. **Customize your course**: By few clicks and swipes, adjusting teaching style, lesson count and language for your course.
 4. **Start course generating**: Touch "Next learning step!" button in the sidebar, then watch how OmniTutor creates personal-customized course for you.
 5. **Interactive learning**: Learn the course, and ask OmniTutor any questions related to this course whenever you encountered them.
+
+## Usage Example (Screenshots)
+
+- Course initialization:
+
+![](pics/init.png)
+
+- Course learning and Q&A with the AI teaching assistant:
+
+![](pics/course1.png)
+
+- The TA agent recommends more questions for you to practice & ask, based on your current learning progress. And you can ask them too!:
+
+![](pics/recommend_question_usage.PNG)
+
+- When you study deeper into the course, the AI teaching assistant will also learn your status and habits, to provide better help for you:
+
+![](pics/adaptive_learning.PNG)
 
 ## Setup and Running
 
