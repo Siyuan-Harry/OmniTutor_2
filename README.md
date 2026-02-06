@@ -38,11 +38,11 @@ OmniTutor - An all-round teacher and a personalized teaching assistant who reall
 
 - Course initialization:
 
-![](pics/init.png)
+![](pics/init.PNG)
 
 - Course learning and Q&A with the AI teaching assistant:
 
-![](pics/course1.png)
+![](pics/course1.PNG)
 
 - The TA agent recommends more questions for you to practice & ask, based on your current learning progress. And you can ask them too!:
 
